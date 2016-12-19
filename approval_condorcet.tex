@@ -1,0 +1,253 @@
+\chapter{Control Problems in Approval Voting and in Condorcet Voting} \label{ch:approval_condorcet}
+
+In the current chapter we study both approval voting and Condorcet voting.
+While these two systems are different in many aspects, their behavior with respect to election control is very similar.
+Specifically, for both systems counting variants of control problems focusing on modifications of the collection of voters are \sharpPclass-complete.
+For both systems it is impossible to make some candidate a winner by adding candidates, and for both systems it is impossible to prevent someone from winning by deleting candidates.
+Because of these similarities we analyze algorithms for control problems in approval system and then adapt them for Condorcet system.
+
+Approval voting can be considered as a generalization of plurality voting because it allows voters to specify not only the single candidate which they prefer most, but any number of candidates they like.
+This change makes this method vulnerable to some types of control, while to the others it becomes resistant or even immune.
+More specifically, approval voting is vulnerable to constructive control by deleting candidates, to destructive control by adding candidates, and to destructive adding or deleting voters.
+It turns out that, unlike in plurality voting, the counting variants of control problems where we modify the set of candidates are in \FPclass, and the counting variants of control problems where we modify the collection of voters are \sharpPclass-complete.
+We show these facts formally in the following sections.
+
+\section{Adding and Deleting Candidates} \label{sec:accan}
+
+Both approval and Condorcet have been proven to be immune to control by adding candidates in constructive case.
+Formally speaking, the answer to their counting variants is always 0, thus the counting problems belong to \FPclass.
+So do their destructive cases (although it is not completely trivial), as we show in the following theorem.
+
+\begin{theorem} \label{th:acacd}
+	\ApControl{AC}{D} and \CdControl{AC}{D} are in \FPclass.
+\end{theorem}
+
+\begin{proof}
+First, let us consider approval system.
+Since we assume every voter $v_i\in V$ provides a set $A_i$ of approved candidates, $A_i\subseteq C\cup C'$, we can easily determine which $c'\in C'$ would beat $c$, when added to the election $E$.
+Let $A$ be the set of candidates in $C'$ that are approved of by at least as many voters as $c$ is.
+The number of possibilities depends on the fact, whether $c$ is already the unique winner of $E$.
+If $c$ is the unique winner prior to adding any candidates, then it suffices to include at least one candidate from $A$ to the election to ensure that $c$ is not the unique winner.
+Otherwise, we can pick any set of $k$ or less candidates from $C'$ and include them in the election.
+
+This observation leads us to the following algorithm.
+
+\begin{codebox}
+\Procname{$\proc{Ap-ACD-Count}(E,C',c,k)$}
+\li	\If $c$ is not the unique winner of $E$ \\[-4mm] \label{apacd:checking_c}
+\li		\Then \Return $\sum_{i=0}^k\binom{|C'|}{i}$ \\[-4mm] \label{apacd:returning_result1}
+		\End
+\li	Let $A$ be the set of candidates $c'\in C'$\!, s.t.\ $\score{(C\cup C',V)}(c')\ge\score{(C\cup C',V)}(c)$. \label{apacd:defining_A}
+\li	$\id{result}:=0$ \label{apacd:result_init}
+\li	\For $j:=1$ \To $k$ \label{apacd:counting_loop}
+\li		\Do $\id{result}:=\id{result}+\sum_{i=1}^{\min(|A|,j)}\binom{|A|}{i}\binom{|C'-A|}{j-i}$ \label{apacd:counting}
+		\End
+\li	\Return $\id{result}$ \label{apacd:returning_result2}
+\end{codebox}
+
+The loop from line~\ref{apacd:counting_loop}, for every $j$, counts the ways in which we can choose exactly $j$ candidates from $C'$; it can be done by first picking $i$ of the candidates in $A$ (who beat~$c$), and then $j-i$ of the candidates in $C'-A$.
+(If $j-i>|C'-A|$, then $\binom{|C'-A|}{j-i}=0$ by the definition of binomial coefficient.)
+
+It is clear that the algorithm works in polynomial time, so the problem \ApControl{AC}{D} is in \FPclass.
+
+The procedure we presented for \ApControl{AC}{D} can be easily transformed to the one for \CdControl{AC}{D}.
+Note that by adding to the election only one candidate $c'\in C'$ such that $\beaten{E'}(c,c')\le n/2$, we can preclude $c$ from being the Condorcet winner.
+Thus, the only changes compared to algorithm \proc{Ap-ACD-Count} are:
+\begin{Enumerate}
+    \item In the first line, instead of testing if $c$ is the unique winner of approval election $E$ we need to test if $c$ is a Condorcet winner of $E$, and
+	\item In the line~\ref{apacd:defining_A} we redefine the set $A$ to be the set of candidates $c'\in C'$ such that $\beaten{E'}(c,c')\le n/2$.
+\end{Enumerate}
+
+Of course, the algorithm we received after this transformation runs in polynomial time, so $\CdControl{AC}{D}\in\FPclass$.
+\end{proof}
+
+Now let us consider a problem dual to the previous one---we now want to delete candidates to either make the distinguished one the unique winner, or to preclude him from being the unique winner.
+We only show how to solve constructive case of this type of control, because approval and Condorcet are immune in its destructive case (which means that both \ApControl{DC}{D} and \CdControl{DC}{D} are trivially in \FPclass).
+
+\begin{theorem} \label{th:acdcc}
+	\ApControl{DC}{C} and \CdControl{DC}{C} are in \FPclass.
+\end{theorem}
+
+\begin{proof}
+The only way to make $c\in C$ the unique winner of approval election $E$, is to remove from $C-\{c\}$ such candidates $c'$, for which $\score{E}(c')>\score{E}(c)$.
+They can be found immediately, since we know how to efficiently compute scores of the candidates.
+Let us assume there are $k_0$ such candidates.
+After removing all of them from $C-\{c\}$, we can also remove $k-k_0$ or less of any remaining candidates other than $c$.
+Based on this observation we provide the following simple algorithm.
+
+\begin{codebox}
+\Procname{$\proc{Ap-DCC-Count}(E,c,k)$}
+\li	Let $k_0$ be the number of candidates $c'\in C-\{c\}$\!, s.t.\ $\score{E}(c')\ge\score{E}(c)$. \label{apdcc:defining_k0}
+\li	\Return $\sum_{i=0}^{k-k_0}\binom{m-k_0-1}{i}$ \label{apdcc:returning_result}
+\end{codebox}
+
+Clearly, the algorithm runs in polynomial-time.
+
+We receive the procedure for \CdControl{DC}{C} after redefining $k_0$ to be the number of candidates $c'$ in $C-\{c\}$ for which $\beaten{E}(c,c')\le n/2$.
+The reader can easily verify that this modification leads to the correct polynomial-time algorithm.
+\end{proof}
+
+\section{Adding and Deleting Voters} \label{sec:acvot}
+
+Let us now move on to the control problems that modify the collection of voters.
+Each of four types of counting problems considered in this section is \sharpPclass-complete, so instead of giving algorithms, we prove these facts formally by showing the particular types of \sharpPclass-completeness for each of them.
+
+\begin{theorem} \label{th:apavc}
+	\ApControl{AV}{C} is \sharpPclass-parsimonious-complete.
+\end{theorem}
+
+\begin{proof}
+It is clear that this problem is in \sharpPclass.
+In order to prove its \sharpPclass-parsimonious-hardness we show a parsimonious reduction from \sharpXthreeC.
+
+Given an instance $(B,\mathcal{S})$ of \sharpXthreeC\ problem, where $B=\{b_1,\dots,b_{3k}\}$ and $\mathcal{S}=\{S_1,\dots,S_r\}$, we construct the following instance of \ApControl{AV}{C}.
+Let $E=(C,V)$ be an election in which $C=B\cup\{c\}$, where $c$ is a distinguished candidate, and $V$ consists of $k-2$ registered voters who each approve of $b_1$,~\dots,~$b_{3k}$ and disapprove of $c$.
+We have also a multiset $V'$ that consists of $r$ unregistered voters.
+For each set $S_j\in\mathcal{S}$, there is a voter in $V'$ who approves of $c$ and the 3 candidates in $S_j$, and who disapproves of all other candidates.
+
+We claim that every multiset $U$, $U\subseteq V'$, such that $|U|\le k$ and that $c$ is a unique winner of approval election $E'=(C,V\uplus U)$ corresponds one-to-one to a family $\mathcal{S'}$, $\mathcal{S'}\subseteq\mathcal{S}$, such that $|\mathcal{S'}|=k$ and $\mathcal{S'}$ is an exact set cover of $B$.
+
+First, let us assume that there is an exact set cover of $B$ in $\mathcal{S}$.
+We fix $U$ to be the whole $V'$ and we consider an election $E'=(C,V\uplus V')$ which, compared to $E$, has the $k$ additional voters that correspond to an exact set cover of $B$.
+Then we have $\score{E'}(c)=k$, and for every $b_i\in B$, we have $\score{E'}(b_i)=k-1$, so $c$ is the unique winner of $E'$.
+
+Now suppose there is a multiset $U$, $U\subseteq V'$, containing at most $k$ voters, such that $c$ is the unique winner of election $E'=(C,V\uplus U)$.
+Then we clearly need to have $|U|=k-1$, but then $|U|=k$, as some $b_i\in B$ reaches additional points.
+Every $b_i\in B$ can gain at most 1 point.
+Since each voter in $V'$ approves of exactly 3 candidates from $B$, it follows that every $b_i\in B$ gains exactly 1 point.
+Thus, multiset $U$ corresponds to an exact set cover of $B$.
+\end{proof}
+
+\begin{theorem} \label{th:cdavc}
+	\CdControl{AV}{C} is \sharpPclass-parsimonious-complete.
+\end{theorem}
+
+\begin{proof}
+The problem is clearly in \sharpPclass, so it suffices to show that it is \sharpPclass-parsimonious-hard.
+We show the transformation from \sharpXthreeC.
+
+Let $(B,\mathcal{S})$ be an instance of \sharpXthreeC\ problem, where $B=\{b_1,\dots,b_{3k}\}$ and $\mathcal{S}=\{S_1,\dots,S_r\}$.
+We create an election $E=(C,V)$, where $C=B\cup\{c\}$.
+Let $V$ consist of $k-3$ voters with preferences $b_1\succ b_2\succ\cdots\succ b_{3k}\succ c$.
+Thus $b_1$ is the Condorcet winner of $E$, and every candidate $b_i\in B$ beats $c$ in $k-3$ votes.
+
+For each set $S_j\in\mathcal{S}$, let $V'$ contain a voter with preference order $b_{j_1}\succ b_{j_2}\succ b_{j_3}\succ c\succ\cdots$, where $b_{j_1}$, $b_{j_2}$, $b_{j_3}\in S_j$ (after $c$ the remaining candidates are ranked in arbitrary order).
+We claim that every multiset $U$, $U\subseteq V'$, such that $|U|\le k$ and that $c$ is a Condorcet winner of election $E'=(C,V\uplus U)$ corresponds one-to-one to a family $\mathcal{S'}$, $\mathcal{S'}\subseteq\mathcal{S}$, such that $|\mathcal{S'}|=k$ and $\mathcal{S'}$ is an exact set cover of $B$.
+
+First assume that $\mathcal{S'}\subseteq\mathcal{S}$ is an exact set cover of $B$.
+For each $S_j\in\mathcal{S'}$ we include the corresponding voter from $V'$ to multiset $U$ and we consider an election $E'=(C,V\uplus U)$.
+For each $b_i\in B$ we have $\beaten{E'}(b_i,c)=\beaten{E}(b_i,c)+1=k-2$ and $\beaten{E'}(c,b_i)=\beaten{E}(c,b_i)+k-1=k-1$.
+Thus $c$ becomes the Condorcet winner of $E'$.
+
+Now assume that $c$ is the Condorcet winner in election $E'=(C,V\uplus U)$, where $U\subseteq V'$.
+There cannot be more than 1 voter in $U$ who prefers any $b_i\in B$ to $c$, since then we would have $\beaten{E'}(b_i,c)\ge\beaten{E}(b_i,c)+2=k-1$, and $\beaten{E'}(c,b_i)\le\beaten{E}(c,b_i)+k-2=k-2$, and so $c$ would lose to $b_i$.
+Thus each $b_i$ is preferred to $c$ by either 0 or 1 voters from $U$.
+If $b_i$ is preferred by 1 voter from $U$, then for $c$ to win he must be preferred by $k-1$ voters from $U$, and since some voter must be added, there must be $|U|=k$.
+
+If there are no voters in $U$ who prefer $b_i$ to $c$, then since the preferences of the $k$ new voters each include 3 positions above $c$, there must be some other $b_{i'}$ that is ranked above $c$ by more than 1 voter.
+This contradicts the requirement that no more than 1 voter in $U$ prefers any other candidate to $c$.
+Therefore each $b_i$ is preferred to $c$ by exactly 1 of the $k$ voters in $U$.
+Thus, the voters from $U$ correspond to an exact set cover of $B$.
+\end{proof}
+
+\begin{theorem} \label{th:acavd}
+	\ApControl{AV}{D} and \CdControl{AV}{D} are \sharpPclass-me\-tric-complete.
+\end{theorem}
+
+\begin{proof}
+The answer to problem \ApControl{AV}{D} is the total number of ways we can choose at most $k$ new voters from $V'$ (which are exactly $\sum_{i=0}^k\binom{|V'|}{i}$) subtracted by the value returned by the problem \ApControl{AV}{C}.
+After theorem~\ref{th:apavc}, \ApControl{AV}{C} is \sharpPclass-parsimonious-complete, and \ApControl{AV}{C} metrically reduces to \ApControl{AV}{D}, so \ApControl{AV}{D} is \sharpPclass-metric-complete.
+
+The similar argumentation holds for problem \CdControl{AV}{D}.
+The solution is equal to $\sum_{i=0}^k\binom{|V'|}{i}$ subtracted by the value of \CdControl{AV}{C} for the given instance.
+Therefore, this problem is \sharpPclass-metric-complete as well.
+\end{proof}
+
+\begin{theorem} \label{th:apdvc}
+	\ApControl{DV}{C} is \sharpPclass-parsimonious-complete.
+\end{theorem}
+
+\begin{proof}
+This problem is in class \sharpPclass.
+We show it is also \sharpPclass-parsimonious-hard by parsimonious reduction from the problem \sharpXthreeC.
+
+Suppose we are given an instance of \sharpXthreeC, $(B,\mathcal{S})$, where $B=\{b_1,\dots,b_{3k}\}$, $\mathcal{S}=\{S_1,\dots,S_r\}$.
+For each $b_i\in B$, we set $\ell_i$ to be the number of sets in $\mathcal{S}$ containing $b_i$.
+
+Let $E=(C,V)$ be an election in which $C=B\cup\{c\}$, where $c$ is the distinguished candidate, and collection $V$ consists of the following voters:
+\begin{Enumerate}
+	\item We have voters $u_1$, $u_2$,~\dots,~$u_r$ such that, for each integer $j$, $1\le j\le r$, $u_j$ approves of all candidates in $S_j$ and $u_j$ disapproves of all other candidates.
+	\item We have voters $v_1$, $v_2$,~\dots,~$v_r$ such that, for each integer $j$, $1\le j\le r$, $v_j$ approves of $c$, and $v_j$ approves of $b_i$ if and only if $j\le r-\ell_i$.
+\end{Enumerate}
+Note that in the election $E$ each candidate has exactly $r$ points.
+
+We claim that every multiset $U$, $U\subseteq V$, such that $|U|\le k$ and that $c$ is a unique winner of approval election $E'=(C,V-U)$ corresponds one-to-one to a family $\mathcal{S'}$, $\mathcal{S'}\subseteq\mathcal{S}$, such that $|\mathcal{S'}|=k$ and $\mathcal{S'}$ is an exact set cover of $B$.
+
+Suppose there is an exact set cover of $B$ in $\mathcal{S}$ and let $U$, $U\subseteq\{u_1,\dots,u_r\}\subseteq V$, be a multiset of $k$ voters that correspond to this set cover.
+In an election $E'=(C,V-U)$ every $b_i\in B$ loses one point, leaving $c$ the unique winner of $E'$.
+
+Now suppose there is a multiset $U$, $U\subseteq V$, containing at most $k$ voters, such that $c$ is the unique winner of election $E'=(C,V-U)$.
+Suppose that for some $j$, $1\le j\le r$, $U$ contains $v_j$.
+Then $c$ has less than $r$ points and there are $b_i\in B$ who still have $r$ points each, and others who have $r-1$ points each.
+In order to make $c$ the unique winner, we need to remove additional voters, so that candidates from $B$ lose more than $3k$ points in total.
+Because each voter $u_j$ approves of exactly 3 candidates from $B$, it contradicts the fact that $|U|\le k$.
+Thus, we assume that $U\subseteq\{u_1,\dots,u_r\}$.
+For $c$ to have become the unique winner, every $b_i\in B$ must have lost at least 1 point.
+It follows that the deleted voters correspond to a set cover of $B$, and since the cover has size at most $k$, this must be an exact set cover of $B$.
+\end{proof}
+
+\begin{theorem} \label{th:cddvc}
+	\CdControl{DV}{C} is \sharpPclass-parsimonious-complete.
+\end{theorem}
+
+\begin{proof}
+It is clear that this problem belongs to \sharpPclass.
+We show that the problem is \sharpPclass-parsimonious-hard by transformation from \sharpXthreeC.
+
+Suppose we are given an instance of \sharpXthreeC, $(B,\mathcal{S})$, where $B=\{b_1,\dots,b_{3k}\}$, $\mathcal{S}=\{S_1,\dots,S_r\}$.
+Without loss of generality, we assume that $r\ge k$ and $k>2$ (if $r<k$ then $\mathcal{S}$ does not contain a set cover of $B$, and if $k\le2$ then we can solve the problem by brute force).
+
+We create an election $E=(C,V)$ in which $C=B\cup\{c,d\}$ and $V$ is the following collection of $4r-k+1$ voters (`$\cdots$' part denotes the remaining candidates in arbitrary order):
+\begin{Enumerate}
+    \item We have $r-k+2$ voters with preference $c\succ d\succ\cdots$.
+	\item We have $r-1$ voters with preference $\cdots\succ c\succ d$.
+	\item For each $S_j\in\mathcal{S}$ ($S_j=\{b_{j_1},b_{j_2},b_{j_3}\}$) we have two voters $u_j$ and $v_j$, such that
+	\begin{Enumerate}
+		\item $u_j$ has preference $d\succ\cdots\succ c\succ b_{j_1}\succ b_{j_2}\succ b_{j_3}$,
+		\item $v_j$ has preference $d\succ b_{j_1}\succ b_{j_2}\succ b_{j_3}\succ c\succ\cdots$.
+	\end{Enumerate}
+\end{Enumerate}
+It is easy to see that for all $b_i\in B$, $\beaten{E}(c,b_i)=2r-k+2$, and $\beaten{E}(c,d)=2r-k+1$.
+
+We claim that every multiset $U$, $U\subseteq V$, such that $|U|\le k$ and that $c$ is a Condorcet winner of election $E'=(C,V-U)$ corresponds one-to-one to a family $\mathcal{S'}$, $\mathcal{S'}\subseteq\mathcal{S}$, such that $|\mathcal{S'}|=k$ and $\mathcal{S'}$ is an exact set cover of $B$.
+
+If family $\mathcal{S}$ contains a $k$-element set cover of $B$, say $\{S_{a_1},\dots,S_{a_k}\}$, then set $U=\{u_{a_1},\dots,u_{a_k}\}$.
+In election $E'=(C,V-U)$ we have $4r-2k+1$ voters, for each $b_i\in B$, $\beaten{E'}(c,b_i)=\beaten{E}(c,b_i)-1$, and $\beaten{E'}(c,d)=\beaten{E}(c,d)$.
+Thus, $c$ is a Condorcet winner of $E'$.
+
+Now assume there is a multiset $U$, $U\subseteq V$, of $k$ or fewer voters, such that $c$ is the Condorcet winner in election $E'=(C,V-U)$.
+The value of $\beaten{E'}(c,d)$ is the same as $\beaten{E}(c,d)$, because we cannot increase it when deleting voters.
+Thus, $c$ defeats $d$ only if $|U|=k$.
+Furthermore, for each $b_i\in B$, $\beaten{E'}(c,b_i)\ge2r-k+1$, so in $U$ we have at most one voter who prefers $c$ to $b_i$, and since $|U|=k$, we have exactly one such voter.
+It follows, that $U\subseteq\{u_1,\dots,u_r\}$, and that voters in $U$ correspond to an exact set cover of~$B$.
+\end{proof}
+
+\begin{theorem} \label{th:acdvd}
+	\ApControl{DV}{D} and \CdControl{DV}{D} are \sharpPclass-metric-complete.
+\end{theorem}
+
+\begin{proof}
+We base on the idea from theorem~\ref{th:acavd}---the problem \ApControl{DV}{D} is a ``complement'' to \ApControl{DV}{C}, and the problem \CdControl{DV}{D} is a ``complement'' to \CdControl{DV}{C}.
+The only change compared to theorem~\ref{th:acavd} is that, instead of $|V'|$, we have $|V|$ in the sum for total number of choices.
+Thus, both problems are \sharpPclass-metric-complete.
+\end{proof}
+
+\section{Summary} \label{sec:acsum}
+
+The main conclusion of this chapter is that approval and Condorcet systems share many similarities with respect to election control.
+Counting variants of each type of control in approval is as hard as in Condorcet.
+Moreover, the algorithms that solve a certain type of control in one system require minor changes only to make them appropriate for the other system.
+
+Another observation one can make is that as far as the complexity of election control goes, approval and Condorcet behave in an exactly opposite way to plurality.
+In plurality, every control problem involving modification of candidate set is \sharpPclass-complete, while such types of control under approval and Condorcet systems are in \FPclass.
+Similarly, control by adding or deleting voters in plurality is \sharpPclass-complete, while in approval and Condorcet it is in \FPclass.

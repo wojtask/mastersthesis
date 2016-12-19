@@ -1,0 +1,300 @@
+\chapter{Control Problems in Plurality Voting} \label{ch:plurality}
+
+Under plurality voting, counting variants of both control by adding candidates and control by deleting candidates are \sharpPclass-complete, as we show it in the following theorems.
+However, polynomial-time algorithms exist for the cases where we modify the collection of voters.
+
+\section{Adding and Deleting Candidates} \label{sec:plcan}
+
+The first problem we consider under plurality voting is constructive control by adding candidates.
+Below we show that this problem is \sharpPclass-parsimonious-complete (the proof approach is inspired by a related result in \cite{faliszewski7}).
+
+\begin{theorem} \label{th:placc}
+    \PlControl{AC}{C} is \sharpPclass-parsimonious-complete.
+\end{theorem}
+
+\begin{proof}
+In the first step we need to show that $\PlControl{AC}{C}\in\sharpPclass$.
+From the definition of class \sharpPclass, we need give polynomial-time NDTM that accepts on as many computational paths as many solutions there are for our problem.
+We can imagine a non-deterministic algorithm that, given an instance $I=(E,C',c,k)$, it simply checks all possible subsets of $C'$ of sizes at most $k$, if any of them consists of exactly those new candidates whose addition to $C$ makes $c$ a unique winner.
+This requires only po\-ly\-no\-mial\-ly many steps because it can non-deterministically choose the next candidate from $C'$ in each step.
+
+To prove that \PlControl{AC}{C} is \sharpPclass-parsimonious-hard, we show that there is a parsimonious reduction from the \sharpXthreeC\ problem (see Definition \ref{def:sharpXthreeC}).
+
+Suppose we are given an instance of \sharpXthreeC, $(B,\mathcal{S})$, where $B=\{b_1,\dots,b_{3k}\}$ and $\mathcal{S}=\{S_1,\dots,S_r\}$ with $r\ge4$ and $k\ge2$.
+For each $b_i\in B$, we set $\ell_i$ to be the number of sets in $\mathcal{S}$ that contain $b_i$.
+
+We construct an election $E=(C,V)$, where $C=B\cup\{c,w\}$ is the set of registered candidates, and $V$ is a multiset of voters.
+We also have a set $A=\{a_1,\dots,a_r\}$ of spoiler (unregistered) candidates.
+Each candidate $a_i$ in $A$ corresponds to a set $S_i$ in $\mathcal{S}$.
+Collection $V$ contains groups of voters with preferences over $C\cup A$ described below.
+For each vote we specify up to two top-ranked candidates; the remaining candidates are ranked in arbitrary order in the `$\cdots$' part.
+\begin{Enumerate}
+	\item For each set $S_j\in\mathcal{S}$, for each $b_i\in S_j$, we have $2k$ votes $a_j\succ b_i\succ\cdots$.
+	\item For each set $S_j\in\mathcal{S}$, we have 1 vote $a_j\succ c\succ\cdots$.
+	\item We have $2rk+k-r+1$ votes $c\succ\cdots$.
+	\item We have $2rk$ votes $w\succ\cdots$.
+	\item For each $b_i\in B$, we have $2rk+2k-2k\ell_i$ votes $b_i\succ\cdots$.
+\end{Enumerate}
+Thus in election $E$ the scores of candidates are as follows:
+\begin{Enumerate}
+	\item $\score{E}(c)=2rk+k+1$,
+	\item $\score{E}(w)=2rk$, and
+	\item for each $b_i\in B$, $\score{E}(b_i)=2rk+2k$.
+\end{Enumerate}
+That is, the winners of plurality election $E$ are exactly the candidates in $B$.
+We claim that every set $A'$, $A'\subseteq A$, such that $|A'|\le k$ and that $c$ is a unique winner of plurality election $E'=(C\cup A',V)$ corresponds one-to-one to a family $\mathcal{S'}$, $\mathcal{S'}\subseteq\mathcal{S}$, such that $|\mathcal{S'}|=k$ and $\bigcup\mathcal{S'}=B$ (i.e., $\mathcal{S'}$ is an exact set cover of $B$).
+
+Let us fix set $A'$.
+It corresponds to a family $\mathcal{S'}$ of 3-sets from $\mathcal{S}$ such that for each integer $j$, $1\le j\le r$, $\mathcal{S'}$ contains set $S_j$ if and only if $A'$ contains $a_j$.
+It is easy to see that in election $E'=(C\cup A',V)$ the scores of candidates are as follows:
+\begin{Enumerate}
+	\item $\score{E'}(c)=2rk+k+1-|A'|$,
+	\item $\score{E'}(w)=2rk$,
+	\item for each $b_i\in B$, $\score{E'}(b_i)=2rk+2k-2k\,|\{a_j\in A':b_i\in S_j\}|$, and
+	\item for each $a_j\in A'$, $\score{E'}(a_j)=6k+1$.
+\end{Enumerate}
+Assume that $c$ is a unique winner of election $E'$.
+Then $c$'s score is the highest among the scores of other candidates.
+Inequality $\score{E'}(c)>\score{E'}(a_j)$ holds for each $a_j\in A'$ under assumption that $r\ge4$.
+In order to have $\score{E'}(c)>\score{E'}(w)$, we need to assume that $|A'|\le k$, and thus $\score{E'}(c)\ge2rk+1$.
+For each $b_i\in B$ there is $\score{E'}(c)>\score{E'}(b_i)$, which holds if $\score{E'}(b_i)\le2rk$, so we have that $|\{a_j\in A':b_i\in S_j\}|\ge1$.
+It means that each $b_i\in B$ belongs to at least one set $S_j$.
+The score of each of the $3k$ candidates in $B$ has to be decreased and each $a_j\in A'$ corresponds to decreasing the score of exactly 3 candidates in $B$, because every $S_j$ contains exactly 3 distinct elements of $B$.
+Thus, $A'$ corresponds to an exact set cover of $B$.
+
+On the other hand, let us assume $A'$ corresponds to an exact set cover of $B$.
+In such a case $|A'|=k$ because in an exact set cover of $3k$-element set we must have exactly $k$ 3-element sets.
+Thus, $\score{E'}(c)=2rk+1$.
+Since each $a_j\in A'$ corresponds to a set $S_j\in\mathcal{S}$ that contains 3 distinct members of $B$, for each $b_i\in B$ we have that $|\{a_j\in A':b_i\in S_j\}|=1$ and therefore $\score{E'}(b_i)=2rk<\score{E'}(c)$.
+For each $a_j\in A'$ it holds $\score{E'}(a_j)=6k+1<2rk+1=\score{E'}(c)$ (since we assumed that $r\ge4$).
+As we can see, $c$ has the greatest score, so it is a unique winner of election $E'$.
+\end{proof}
+
+In our further proofs in which we show reductions from \sharpXthreeC\ problem, we will not be as precise and we will be describing things less explicitly.
+In particular, we assume that the reader can easily verify that a problem belongs to class \sharpPclass\ based on the method in the proof above.
+
+Thanks to the proved fact, we can easily show \sharpPclass-completeness (in the sense of Krentel) of the destructive control by adding candidates.
+In our proof the answer to the problem depends on its instance as well as on the number of solutions in the constructive case.
+Although we do not show the problem's possible \sharpPclass-parsimonious-completeness, we do not claim it does not hold.
+
+\begin{theorem} \label{th:placd}
+	\PlControl{AC}{D} is \sharpPclass-metric-complete.
+\end{theorem}
+
+\begin{proof}
+Let $I=(E,C',c,k)$ be an instance of \PlControl{AC}{C} and let $s_I$ be the number of solutions to $I$, i.e., the number of sets of at most $k$ candidates from $C'$ whose inclusion in election $E$ makes $c$ the unique winner.
+Note, there are exactly $\sum_{i=0}^k\binom{|C'|}{i}$ sets $B$ such that $B\subseteq C'$ and $|B|\le k$, so we have that the answer to \PlControl{AC}{D} for instance $I$ is exactly $\sum_{i=0}^k\binom{|C'|}{i}-s_I$.
+
+After theorem~\ref{th:placc}, every \sharpPclass-problem parsimoniously reduces to \PlControl{AC}{C}.
+We also have that \PlControl{AC}{C} metrically reduces to \PlControl{AC}{D}, since the number of solutions to $I$ depends on $s_I$ and on $I$ itself.
+Thus, every \sharpPclass-problem metrically reduces to \PlControl{AC}{D}.
+\end{proof}
+
+Let us now move on to control by deleting candidates in plurality elections.
+The proof of the following theorem is also based on the similar one from \cite{faliszewski7}.
+
+\begin{theorem} \label{th:pldcc}
+    \PlControl{DC}{C} is \sharpPclass-parsimonious-complete.
+\end{theorem}
+
+\begin{proof}
+It is clear that this problem belongs to \sharpPclass.
+We prove that it is \sharpPclass-parsimonious-hard by showing a parsimonious reduction from \sharpXthreeC.
+
+Let $(B,\mathcal{S})$ be an instance of the \sharpXthreeC\ problem, where $B=\{b_1,\dots,b_{3k}\}$ and $\mathcal{S}=\{S_1,\dots,S_r\}$ with $k\ge7$ and $r\ge1$.
+
+We construct a \PlControl{DC}{C} instance as follows.
+Let $A=\{a_1,\dots,a_r\}$ and let $E=(C,V)$ be an election, where $C=B\cup A\cup\{c\}$, and collection $V$ contains groups of voters with the following preferences.
+For each vote we specify up to two top candidates and up to one ranked-lowest candidate; the remaining candidates are ranked in arbitrary order in the `$\cdots$' part.
+\begin{Enumerate}
+	\item For each set $S_j\in\mathcal{S}$, for each $b_i\in S_j$, we have 1 vote $a_j\succ b_i\succ\cdots\succ c$.
+	\item For each set $S_j\in\mathcal{S}$, we have 1 vote $a_j\succ c\succ\cdots$.
+	\item For each $b_i\in B$, we have $k-2$ votes $b_i\succ\cdots\succ c$.
+\end{Enumerate}
+In election $E$ we have the following scores:
+\begin{Enumerate}
+	\item $\score{E}(c)=0$,
+	\item for each $b_i\in B$, $\score{E}(b_i)=k-2$, and
+	\item for each $a_j\in A$, $\score{E}(a_j)=4$.
+\end{Enumerate}
+The winners of election $E$ are exactly the candidates in $B$.
+We claim that every set $A'$, $A'\subseteq A$, such that $|A'|\le k$ and that $c$ is a unique winner of plurality election $E'=(C-A',V)$ corresponds one-to-one to a family $\mathcal{S'}$, $\mathcal{S'}\subseteq\mathcal{S}$, such that $|\mathcal{S'}|=k$ and $\mathcal{S'}$ is an exact set cover of $B$.
+
+First, assume that $A'$ is a subset of $A$ such that $\{S_i\in\mathcal{S}:a_i\in A'\}$ is an exact set cover of $B$.
+It is easy to see that $c$ is a unique winner of plurality election $E'=(C-A',V)$, because $\score{E'}(c)=k$, for each $b_i\in B$, $\score{E'}(b_i)=k-1$, and for each $a_j\in A-A'$, $\score{E'}(a_j)=4$.
+
+On the other hand, assume that there exists a set $A'\subseteq B\cup A$ of candidates, $|A'|\le k$, such that $c$ is a unique winner of election $E'=(C-A',V)$.
+Since $|A'|\le k$, there are at least $2k$ candidates from $B$ in $E'$ and so it has to be $\score{E'}(c)\ge k-1$.
+However, the only way to increase $c$'s score to $k-1$ (or higher) by deleting at most $k$ candidates is to delete $k-1$ (or more) candidates from $A$.
+Now, if we delete exactly $k-1$ candidates from $A$, there is some candidate $b_i\in B$ in the election, for which $\score{E'}(b_i)\ge k-1$.
+Thus, $A'$ must contain exactly $k$ candidates from $A$.
+Deleting these candidates increases $c$'s score to be $k$.
+To ensure that the scores of the candidates in $B$ do not exceed $k$, we must ensure that $A'$ corresponds to an exact set cover of $B$ by sets from $\mathcal{S}$, so the score of each candidate in $B$ chops down to at most $k-1$.
+\end{proof}
+
+\begin{theorem} \label{th:pldcd}
+	\PlControl{DC}{D} is \sharpPclass-metric-complete.
+\end{theorem}
+
+\begin{proof}
+This fact follows from \sharpPclass-parsimonious-completeness of constructive version of deleting candidates in plurality election.
+Similarly as in theorem~\ref{th:placd}, we define $I=(E,c,k)$ to be an instance of \PlControl{DC}{C} and we define $s_I$ to be a number of solutions to $I$.
+It can be verified that the answer to \PlControl{DC}{D} for $I$ is exactly $\sum_{i=0}^k\binom{m-1}{i}-s_I$.
+Thus, the problem is \sharpPclass-metric-complete, after the similar argumentation as in theorem~\ref{th:placd}.
+\end{proof}
+
+\section{Adding and Deleting Voters} \label{sec:plvot}
+
+In control by adding voters we have a collection $V'$ containing additional voters we can use to make $c$ the unique winner.
+Intuitively, in order to make $c$ the unique winner, we should add to the election voters from $V'$ that rank $c$ first, and once we have done that, we can get from $V'$ other voters, while not exceeding $k$ selections in total.
+This strategy leads us to a polynomial-time algorithm which returns the number of such selections.
+
+\begin{theorem} \label{th:plavc}
+	\PlControl{AV}{C} is in \FPclass.
+\end{theorem}
+\begin{proof}
+For each integer $i$, $0\le i\le m-1$, let $A_i$ be a multiset, such that $A_i\subseteq V'$ and it contains voters that rank $c_i$ first (we assume $c_0=c$).
+We provide the algorithm which counts all the solutions, and we prove it works in polynomial time.
+We use function $\id{count}(E,V',c,k,j)$ which counts how many possibilities there are, such that we can choose at most $k-j$ elements from $V'-A_0$, preserving $c$ as the unique winner of the altered election.
+The pseudocode of the algorithm is presented below.
+
+\begin{codebox}
+\Procname{$\proc{Pl-AVC-Count}(E,V',c,k)$}
+\li	\If $c$ is the unique winner of $E$ \label{plavc:c_checking}
+\li		\Then $k_0:=0$ \label{plav:k0_init1}
+\li		\Else $k_0:=\max_{c_i\in C}(\score{E}(c_i)-\score{E}(c)+1)$ \label{plavc:k0_init2}
+		\End
+\li	$\id{result}:=0$ \label{plavc:result_init}
+\li	\For $j:=k_0$ \To $\min(|A_0|,k)$ \label{plavc:counting_loop}
+\li		\Do $\id{result}:=\id{result}+\,\binom{|A_0|}{j}\cdot\id{count}(E,V',c,k,j)$ \label{plavc:counting}
+		\End
+\li	\Return $\id{result}$ \label{plavc:returning_result}
+\end{codebox}
+
+At the beginning, the algorithm finds the minimum number $k_0$ of elements from $A_0$ that added to $V$ will make $c$ the unique winner of election $E$.
+Clearly, if $c$ already is the unique winner of $E$, then $k_0$ is 0, and otherwise $k_0$ is $\max_{c_i\in C}(\score{E}(c_i)-\score{E}(c)+1)$.
+After we compute $k_0$, we loop from this value until $|A_0|$ or $k$ is reached, depending which of them is smaller, and we collect partial results.
+More specifically, for each integer $j$, $k_0\le j\le\min(|A_0|,k)$, we compute the number of multisets $U$, $U\subseteq V'$, such that $U$ contains exactly $j$ voters from $A_0$, at most $k-j$ voters from $V'-A_0$, and $c$ is the unique winner of $E=(C,V\uplus U)$.
+It is easy to verify that for a given $j$, there are exactly $h(j)=\binom{|A_0|}{j}\cdot\id{count}(E,V',c,k,j)$ such multisets.
+Our algorithm returns $\sum_{j=k_0}^{\min(|A_0|,k)}h(j)$.
+To complete the proof it suffices to show the subroutine \id{count} can be computed in polynomial time.
+
+Let us fix $j$, $k_0\le j\le\min(|A_0|,k)$ and show how to compute $\id{count}(E,V',c,k,j)$.
+Our goal is to count the number of ways in which we can add at most $k-j$ voters from $V'-A_0$ so that no candidate $c_i\in C$ has score higher than $\score{E}(c)+j-1$.
+For each candidate $c_i\in C$, we can add at most
+\[
+	\ell_i = \min\bigl(|A_i|,j+\score{E}(c)-\score{E}(c_i)-1\bigr),
+\]
+voters from $A_i$; otherwise $c_i$'s score would exceed $\score{E}(c)+j-1$.
+
+For each integer $p$, $0\le p\le k-j$, and each integer $q$, $1\le q\le m-1$, let $a_{p,q}$ be the number of multisets $U$, $U\subseteq A_1\cup A_2\cup\cdots\cup A_q$, that contain exactly $p$ voters and such that each candidate $c_1$, $c_2$,~\dots,~$c_q$ has score at most $\score{E}(c)+j-1$ in the election $E=(C,V\uplus U)$.
+It can be checked that $a_{p,q}$ holds the recursion:
+\[
+	a_{p,q} =
+	\begin{cases}
+		\sum_{i=0}^{\min(\ell_q,p)}\!\binom{|A_q|}{i}a_{p-i,q-1}, & \text{if $p>0$ and $q>1$}, \\[2mm]
+		1, & \text{if $p=0$ and $q>1$}, \\[1mm]
+		\binom{|A_1|}{p}, & \text{if $p\le|A_1|$ and $q=1$}, \\[1mm]
+		0, & \text{if $p>|A_1|$ and $q=1$}.
+	\end{cases}
+\]
+These values can be computed in polynomial time via standard dynamic programming method.
+Naturally, $\id{count}(E,V',c,k,j)=\sum_{p=0}^{k-j}a_{p,m-1}$.
+
+As we can see, function \id{count} is polynomial-time computable, and so is the main algorithm.
+\end{proof}
+
+Using this theorem, we can easily get a result for the destructive setting.
+
+\begin{theorem} \label{th:plavd}
+	\PlControl{AV}{D} is in \FPclass.
+\end{theorem}
+
+\begin{proof}
+The main observation we make, is that the solution to \PlControl{AV}{D} is equal to the number of all possible selections of at most $k$ new voters from $V'$, subtracted by the number of such selections that make $c$ the unique winner.
+There are exactly $\sum_{i=0}^k\binom{|V'|}{i}$ multisets $U$ such that $U\subseteq V'$ and $|U|\le k$.
+Of these, there are exactly $\proc{Pl-AVC-Count}(E,V',c,k)$ multisets of voters whose inclusion in the election ensures that $c$ is the unique winner.
+Thus, there are exactly
+\[
+	\sum_{i=0}^k\binom{|V'|}{i}-\proc{Pl-AVC-Count}(E,V',c,k)
+\]
+multisets $U$ of cardinality at most $k$ containing voters from $V'$ whose inclusion in the election ensures that $c$ is not the unique winner.
+Clearly, we can compute this value in polynomial time.
+\end{proof}
+
+The control by deleting voters is similar to the one where we add them, but instead of looking for additional voters, we can only remove them from the election.
+It is clear that deleting voters for which $c$ is not the top-ranked candidate is a necessary action to make $c$ the winner.
+We use this observation in the following theorem.
+
+\begin{theorem} \label{th:pldvc}
+	\PlControl{DV}{C} is in \FPclass.
+\end{theorem}
+
+\begin{proof}
+For each integer $i$, $0\le i\le m-1$, let $A_i$ be a multiset, such that $A_i\subseteq V$ and it contains voters that rank $c_i$ first (we assume $c_0=c$).
+For each integer $j$, $0\le j\le k$, we define $\id{count}(E,c,k,j)$ to be the number of multisets $U$, $U\subseteq V-A_0$ such that:
+\begin{Enumerate}
+	\item $|U|\le k-j$, and
+	\item in election $E'=(C,V-U)$ for each candidate $c_i\in C$ it holds $\score{E'}(c_i)\le\score{E}(c)-j-1$.
+\end{Enumerate}
+The following algorithm returns the number of solutions to the problem.
+
+\begin{codebox}
+\Procname{$\proc{Pl-DVC-Count}(E,c,k)$}
+\li	$\id{result}:=0$ \label{pldvc:result_init}
+\li	\For $j:=0$ \To $\min(|A_0|,k)$ \label{pldvc:counting_loop}
+\li		\Do $\id{result}:=\id{result}+\,\binom{|A_0|}{j}\cdot\id{count}(E,c,k,j)$ \label{pldvc:counting}
+		\End
+\li	\Return $\id{result}$ \label{pldvc:returning_result}
+\end{codebox}
+
+In each iteration of the main loop we consider deleting exactly $j$ voters from $A_0$ (there are $\binom{|A_0|}{j}$ ways to pick these $j$ voters).
+Assuming we remove from $V$ exactly $j$ members of $A_0$, we must also remove some number of voters from $V-A_0$, to make sure that $c$ is the unique winner of the resulting election.
+The number of ways in which this can be achieved is $\id{count}(E,c,k,j)$.
+It is easy to verify that indeed our algorithm works correctly.
+It remains to show how to compute $\id{count}(E,c,k,j)$.
+
+Let us fix some value $j$, $0\le j\le\min(|A_0|,k)$.
+For each $c_i\in C$, we define:
+\[
+    \ell_i = \max\bigl(0,j+\score{E}(c_i)-\score{E}(c)+1\bigr).
+\]
+Intuitively, $\ell_i$ is the minimal number of voters from $A_i$ that need to be removed from the election for $c$ to have score higher than $c_i$ (assuming $j$ voters from $A_0$ have been already removed from the election).
+
+For each integer $p$, $0\le p\le k-j$, and each integer $q$, $1\le q\le m-1$, let $a_{p,q}$ be the number of multisets $U$, $U\subseteq A_1\cup A_2\cup\dots\cup A_q$, such that $|U|=p$ and each candidate $c_1$, $c_2$,~\dots,~$c_q$ has score at most $\score{E}(c)-j-1$ in election $E'=(C,V-U)$.
+The following recursive relation holds:
+\[
+	a_{p,q} =
+	\begin{cases}
+		\sum_{i=\ell_q}^{\min(|A_q|,p)}\!\binom{|A_q|}{i}a_{p-i,q-1}, & \text{if $p\ge\ell_q$ and $q>1$}, \\[2mm]
+		\binom{|A_1|}{p}, & \text{if $p\ge\ell_1$ and $q=1$}, \\[1mm]
+		0, & \text{if $p<\ell_q$}.
+	\end{cases}
+\]
+Thus, for each $p,q$ we can compute $a_{p,q}$ in polynomial time using dynamic programming techniques in polynomial time.
+It is easy to see that $\id{count}(E,c,k,j)=\sum_{p=0}^{k-j}a_{p,m-1}$, which also is polynomial-time computable.
+\end{proof}
+
+As earlier, we can show that the destructive control by deleting voters can be considered as a complement to the number of possibilities in the constructive case of this problem.
+
+\begin{theorem} \label{th:pldvd}
+	\PlControl{DV}{D} is in \FPclass.
+\end{theorem}
+
+\begin{proof}
+We will show it by analogy to the proof of theorem~\ref{th:plavd}.
+The destructive case of deleting voters can be solved by computing the number of possible selections of at most $k$ voters, which will be removed from the election in order to make $c$ the unique winner, and by subtracting this value from the number of all possible selections of at most $k$ voters.
+There are exactly $\sum_{i=0}^k\binom{n}{i}$ multisets $U$ such that $U\subseteq V$ and $|U|\le k$.
+Among them there are exactly $\proc{Pl-DVC-Count}(E,c,k)$ multisets of voters whose deletion from the election ensures that $c$ is the unique winner.
+Therefore, the answer to this problem is
+\[
+    \sum_{i=0}^k\binom{n}{i}-\proc{Pl-DVC-Count}(E,c,k),
+\]
+and it can obviously be produced in polynomial time.
+\end{proof}
+
+\section{Summary} \label{sec:plsum}
+
+In this chapter we have studied counting variants of control problems under plu\-ra\-li\-ty voting system.
+We showed that controlling by altering the set of candidates leads to \sharpPclass-complete problems---control by adding or deleting candidates when considering the constructive case is \sharpPclass-parsimonious-complete, while under the destructive case these types of control are \sharpPclass-metric-complete.
+However, each type of control involving changes in the voters' multiset is computationally easy---we showed that these problems are in \FPclass\ and we developed algorithms that solve them in polynomial-time.

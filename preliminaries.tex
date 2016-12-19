@@ -1,0 +1,587 @@
+\chapter{Preliminaries} \label{ch:preliminaries}
+
+In order to formally study elections, we need to use a precise mathematical apparatus.
+In Section~\ref{sec:basic} we define certain set-theoretic structures that we use in the further work and that need a subtle treatment.
+In Section~\ref{sec:complexity} we define some useful notions of formal language theory and computational complexity theory.
+Throughout this chapter we also provide brief examples that help understand the theory we introduce.
+An experienced reader can either skim or skip this chapter.
+However, our definitions may slightly differ from those in literature.
+Also, we make some assumptions that will be used in the whole work and that are described here.
+
+\section{Basic Concepts} \label{sec:basic}
+
+We start by defining some basic mathematical notions.
+We assume that the reader is familiar with such fundamental set-theory notions as set, union, intersection, difference, subset, empty set, set membership, and ordered pair.
+
+Let us define the set of naturals to be $\mathbb{N}=\{0,1,\dots\}$ (that is, we take $\mathbb{N}$ to contain~0) and the set of integers to be $\mathbb{Z}=\{\dots,-2,-1,0,1,2,\dots\}$.
+
+\begin{definition}
+	A Cartesian product of two sets $A$ and $B$, denoted $A\times B$, is a set of all ordered pairs whose first element is a member of $A$ and whose second element is a member of $B$:
+	\[
+		A\times B = \{\,(a,b):a\in A,\,b\in B\,\}.
+	\]
+	Product $A\times A$ is often denoted $A^2$.
+\end{definition}
+
+\begin{definition}
+    A (binary) relation $R$ between sets $A$ and $B$ is a subset of $A\times B$.
+	If $A=B$, we say that $R$ is a relation over $A$.
+	If $(a,b)\in R$, we denote this by $a\,R\,b$.
+\end{definition}
+
+\begin{Example}
+	Suppose we have the set of card figures
+	\[
+	    F = \{\id{Ace},\id{Two},\id{Three},\id{Four},\id{Five},\id{Six},\id{Seven},\id{Eight},\id{Nine},\id{Ten},\id{Jack},\id{Queen},\id{King}\},
+	\]
+	and the set of card suits
+	\[
+		S = \{\id{Spades},\id{Clubs},\id{Hearts},\id{Diamonds}\}.
+	\]
+	The set $F\times S$ represents the complete 52-card deck.
+	Every 5-element set $R$, $R\subseteq F\times S$, is a relation between sets $F$ and $S$ representing a single poker hand.
+\end{Example}
+
+\begin{definition}
+	We say that a relation $R$ over $A$ is:
+	\begin{Enumerate}
+		\item reflexive, if for all $a\in A$ it holds that $a\,R\,a$;
+		\item symmetric, if for all $a$, $b\in A$ it holds that $a\,R\,b$ implies $b\,R\,a$;
+		\item antisymmetric, if for all $a$, $b\in A$ it holds that $a\,R\,b$ and $b\,R\,a$ implies $a=b$;
+		\item transitive, if for all $a$, $b$, $c\in A$ it holds that $a\,R\,b$ and $b\,R\,c$ implies $a\,R\,c$;
+		\item total, if for all $a$, $b\in A$ it holds that either $a\,R\,b$ or $b\,R\,a$.
+	\end{Enumerate}
+\end{definition}
+
+\begin{definition}
+    Let $A$ be some set and let \,$\succ$ be some relation over $A$.
+	Relation \,$\succ$ is called a partial order, if it is reflexive, antisymmetric and transitive.
+	If \,$\succ$ is also total, we say that $\succ$ is a total (or linear) order.
+\end{definition}
+
+Note for a partial order $\succ$ over $A$ that there can be such elements $a$, $b\in A$ for which neither $a\succ b$ nor $b\succ a$ holds, i.e., these elements are incomparable.
+If the relation $\succ$ is a total order, such elements do not exist.
+
+We can now define functions.
+Informally speaking, a \emph{function} is a relation between sets $A$ and $B$ that binds every element from $A$ with exactly one element from $B$.
+
+\begin{definition}
+    Let $A$, $B$ be some sets, and let $f$ be a relation between $A$ and $B$.
+	We say that $f$ is a function if:
+	\begin{Enumerate}
+	    \item for all $a\in A$ there exists $b\in B$ such that $(a,b)\in f$, and
+		\item for all $a\in A$, $b_1$, $b_2\in B$ it holds that $(a,b_1)\in f$ and $(a,b_2)\in f$ implies $b_1=b_2$.
+	\end{Enumerate}
+	If $f$ is a function between $A$ and $B$, we write $f\colon A\mapsto B$.
+	If $(a,b)\in f$, we denote this by $f(a)=b$.
+\end{definition}
+
+\begin{definition}
+    Let $A$ be some set and let $f$ be a function, $f\colon A\mapsto\mathbb{N}$.
+	An ordered pair $X=(A,f)$ is called a multiset over $A$.
+	We write $a\in X$, if $a\in A$ and $f(a)>0$.
+\end{definition}
+
+Multisets are generalizations of sets.
+Intuitively, every element of a multiset is paired with an information regarding how many copies of it are members of the multiset.
+The first element of the pair, $A$, from the definition above denotes the set from which we take elements, and the second element, called multiplicity function, for every $a\in A$ assigns its multiplicity (i.e., the number of instances of this element present in the multiset).
+If we do not want to specify at the given moment if the structure we are speaking of is a set or a multiset, we use a word \emph{collection}.
+
+Let us now define basic operations on multisets.
+
+\begin{definition}
+    Let $X=(A,f)$ and $Y=(A,g)$ be multisets over $A$.
+	Their sum, denoted $X\uplus Y$, is the multiset $Z=(A,h)$, where for all $a\in A$, $h(a)=f(a)+g(a)$.
+\end{definition}
+
+The symbol $\uplus$ is used here to denote the sum of multisets, as opposed to their union ($\cup$) defined further.
+It can be easily shown that the multiset sum operation has the following properties:
+\begin{Enumerate}
+    \item commutativity: $X\uplus Y=Y\uplus X$,
+	\item associativity: $X\uplus(Y\uplus Z)=(X\uplus Y)\uplus Z$, and
+	\item there exists the null multiset $\emptyset$, such that $X\uplus\emptyset=X$.
+\end{Enumerate}
+It is important to note that the multiset sum is not idempotent, i.e., $X\uplus X\ne X$.
+
+\begin{definition}
+    Let $X=(A,f)$ and $Y=(A,g)$ be multisets over $A$.
+	Their union, denoted $X\cup Y$, is the multiset $Z=(A,h)$, where for all $a\in A$, $h(a)=\max(f(a),g(a))$.
+\end{definition}
+
+\begin{definition}
+    Let $X=(A,f)$ and $Y=(A,g)$ be multisets over $A$.
+	Their intersection, denoted $X\cap Y$, is the multiset $Z=(A,h)$, where for all $a\in A$, $h(a)=\min(f(a),g(a))$.
+\end{definition}
+
+\begin{definition}
+    Let $X=(A,f)$ and $Y=(A,g)$ be multisets over $A$.
+	Their difference, denoted $X-Y$\!, is the multiset $Z=(A,h)$, where for all $a\in A$, $h(a)=\max(0,f(a)-g(a))$.
+\end{definition}
+
+Unlike the sum of multisets, the operation of multiset intersection and the operation of multiset difference can be viewed as generalizations of plain set intersection and plain set difference.
+Thus, the usage of the same symbols does not lead to misunderstandings.
+Well-known laws involving unions, intersections and differences that hold for sets, are also valid when regarding multisets.
+
+\begin{definition}
+    Let $X=(A,f)$ and $Y=(A,g)$ be multisets over $A$.
+	We write $X\subseteq Y$ if, for all $a\in A$, $f(a)\le g(a)$.
+	We say multisets $X$ and $Y$ are equal, if $X\subseteq Y$ and $Y\subseteq X$, which holds only if $f=g$.
+\end{definition}
+
+We use the same method for describing elements of some multiset as it is done for sets.
+For example, by writing $X=\{1,1,2\}$ we mean the multiset $X$ that contains two copies of 1, and one copy of 2.
+However, we should say what the underlying set of the multiset is beforehand.
+This is important, because $X$ from this paragraph can be viewed as $X=(A,f)$ such that, for example:
+\begin{Enumerate}
+	\renewcommand{\labelenumi}{(\roman{enumi})}
+	\item $\;A=\{1,2\}$ and $f(1)=2$, $f(2)=1$, or
+	\item $A=\mathbb{N}$ and $f(1)=2$, $f(2)=1$, and for all $a\in\mathbb{N}-\{1,2\}$, $f(a)=0$.
+\end{Enumerate}
+\vskip5pt
+(There are, of course, more interpretations of this notation than these two.)
+Thus, it is necessary to indicate what $A$ is.
+We should also remember that, unlike for sets, $\{1,1\}\ne\{1\}$.
+
+\begin{definition}
+    Let $A$ be some set.
+	The cardinality of $A$, denoted by $|A|$, is the number of elements in $A$.
+	Set $A$ is finite if it has a finite number of elements.
+	Set $A$ is empty if $|A|=0$.
+\end{definition}
+
+\begin{definition}
+    Let $X=(A,f)$ be some multiset over set $A$.
+	The cardinality of $X$, denoted by $|X|$, is the number $\sum_{a\in A}f(a)$.
+	Multiset $X$ is finite if set $A$ is finite.
+	Multiset $X$ is empty if $|X|=0$.
+\end{definition}
+
+In this work most of sets and multisets we consider are finite, unlike $\mathbb{N}$ which is an \emph{infinite} set.
+Particularly, every election we study in this work consists of a finite set of candidates and a finite multiset of voters.
+
+\begin{Example}
+    Let $X=(A,f)$ and $Y=(A,g)$ be multisets over $A=\{1,2,3\}$ such that $X=\{1,1,2\}$ and $Y=\{1,3\}$.
+	We have:
+	\begin{align*}
+	    X\uplus Y &= \{1,1,1,2,3\}; \\
+		X\cup Y &= \{1,1,2,3\}; \\
+		X\cap Y &= \{1\}; \\
+		X-Y &= \{1,2\}.
+	\end{align*}
+	It is true that $\{1,1\}\subseteq X$, but $\{1,1\}\not\subseteq Y$.
+	The cardinalities of $X$ and $Y$ are: $|X|=3$, $|Y|=2$.
+\end{Example}
+
+We will need some basic notions of graph theory, in particular a directed graph and an induced subgraph.
+
+\begin{definition}
+	A (directed) graph $G$ is an ordered pair $(V,A)$ where $V$ is a finite set of vertices and $A\subseteq V\times V$ is a set of arcs.
+\end{definition}
+
+If $G=(V,A)$ is a graph, $a\in A$, and $a=(u,v)$, we say that $a$ is an arc from $u$ to $v$ or that $a$ is \emph{leaving} $u$ and $a$ is \emph{entering} $v$.
+Often we modify graphs by adding or removing vertices or arcs.
+These operations are straightforward, however, when we attempt to remove vertices from a graph, we automatically remove each arc that leaves or enters the removed vertices.
+By removing vertices we obtain induced subgraphs.
+
+\begin{definition}
+    Let $G=(V,A)$ be a directed graph and $V'\subseteq V$.
+	We say $G'=(V',A')$ is an induced subgraph of $G$, if $A'=A\cap(V'\!\times V')$.
+\end{definition}
+
+Let us now define some notations we will need to describe the asymptotic running time of algorithms.
+
+\begin{definition}
+    Let $g$ be a function, $g\colon\mathbb{N}\mapsto\mathbb{Z}$.
+	We denote by $\Theta(g(n))$, $O(g(n))$, $\Omega(g(n))$ the following sets of functions:
+	\[
+		\begin{split}
+			\Theta(g(n)) &= \bigl\{\,f\colon\mathbb{N}\mapsto\mathbb{Z}:\text{there exist positive constants $c_1$, $c_2$, and $n_0$ such that} \\
+			&\qquad 0 \le c_1g(n)\le f(n)\le c_2g(n) \text{ for all $n\ge n_0$}\,\bigr\}, \\
+			O(g(n)) &= \bigl\{\,f\colon\mathbb{N}\mapsto\mathbb{Z}:\text{there exist positive constants $c$, and $n_0$ such that} \\
+			&\qquad 0 \le f(n)\le cg(n) \text{ for all $n\ge n_0$}\,\bigr\}, \\
+			\Omega(g(n)) &= \bigl\{\,f\colon\mathbb{N}\mapsto\mathbb{Z}:\text{there exist positive constants $c$, and $n_0$ such that} \\
+			&\qquad 0 \le cg(n)\le f(n) \text{ for all $n\ge n_0$}\,\bigr\}.
+		\end{split}
+	\]
+\end{definition}
+
+Because $\Theta(g(n))$ is a set, we could write $f\in\Theta(g(n))$ to indicate that $f$ is a member of $\Theta(g(n))$.
+Instead, by a slight abuse of notation, we will typically write $f=\Theta(g(n))$ to express the same notion (the same rule applies to notations $O$ and $\Omega$).
+If $f=\Theta(g(n))$, we say that function $g$ is \emph{asymptotically tight bound} for $f$.
+If $f=O(g(n))$, we say that function $g$ is \emph{asymptotically upper bound} for $f$.
+If $f=\Omega(g(n))$, we say that function $g$ is \emph{asymptotically lower bound} for $f$.
+
+From the definition of the asymptotic notations, it is easy to prove the following proposition.
+
+\begin{proposition}
+    For any two functions $f$, $g\colon\mathbb{N}\mapsto\mathbb{Z}$, we have $f=\Theta(g(n))$ if and only if $f=O(g(n))$ and $f=\Omega(g(n))$.
+\end{proposition}
+
+\begin{Example}
+    Let $f(n)=n-5$ and $g(n)=2011n^2-2012n+1$.
+	We have:
+	\begin{align*}
+		f = O(n^2) \quad \text{and} \quad f \ne \Omega(n^2) \quad &\text{and thus} \quad f \ne \Theta(n^2); \\
+		g = O(n^2) \quad \text{and} \quad g = \Omega(n^2) \quad &\text{and thus} \quad g = \Theta(n^2); \\
+		f = O(n^2) \quad \text{and} \quad g = O(n^2) \quad &\text{but it does not mean that $f=g$}.
+	\end{align*}
+\end{Example}
+
+\section{Computational Complexity Review} \label{sec:complexity}
+
+We seek algorithmic and complexity-theoretic results regarding various election-related problems.
+Thus, we now review basic notions of computational complexity theory.
+
+We start by giving formal definitions of what function and decision problems are from the point of view of complexity theory.
+
+\begin{definition}
+    A (computational) problem $\Pi$ is a binary relation between a set \,$\mathcal{I}$ of problem instances and a set \,$\mathcal{S}$ of problem solutions.
+	If the binary relation is a function, we call \,$\Pi$ a function problem.
+\end{definition}
+
+\begin{definition}
+    A decision problem $\Pi$ is a function between a set \,$\mathcal{I}$ of problem instances and a set \,$\{\textnormal{``yes''},\textnormal{``no''}\}$.
+\end{definition}
+
+In computational problems there can be many correct outputs for the specified input, while in function problems, given an instance, there is a single correct answer.
+Decision problems focus on determining whether for some their instances there is a solution or not, without finding the particular solution.
+Of course, every decision problem is a function problem, and every function problem is a computational problem.
+
+\begin{Example} \label{ex:problems}
+    Let us consider the computational problem of determining any prime divisor of a natural number greater than 1.
+	This problem can be viewed as a binary relation $\Pi\subseteq\mathcal{I}\times\mathcal{S}$, such that $\mathcal{I}=\mathbb{N}-\{0,1\}$ and $\mathcal{S}$ is the set of all primes.
+	It holds, e.g., $(5,5)\in\Pi$, $(12,2)\in\Pi$, $(12,3)\in\Pi$, $(12,5)\not\in\Pi$.
+	Since there are numbers that have more than one prime divisor (e.g., 12), $\Pi$ is not a function problem.
+
+	Let us consider another computational problem of determining whether a natural number is prime or not.
+	It can be viewed as a function $\Pi'\colon\mathcal{I}'\mapsto\{\textnormal{``yes''},\textnormal{``no''}\}$, such that $\mathcal{I}'=\mathbb{N}$.
+	Thus, $\Pi'$ is a decision problem.
+	It holds that, e.g., $\Pi'(5)=\textnormal{``yes''}$, $\Pi'(12)=\textnormal{``no''}$.
+\end{Example}
+
+If a computer program is to solve a computational problem, problem instances must be represented in a way that the computer understands.
+An \emph{encoding} for a problem $\Pi$ provides a way of describing each instance of $\Pi$ by an appropriate string (a finite sequence) of symbols over some fixed set, like $\{0,1\}$.
+For example, we are familiar with encoding $\mathit{b}$ of the natural numbers $\mathbb{N}$ as the binary strings $\{0,1,10,11,100,\dots\}$.
+Using this encoding, $\mathit{b}(13)=1011$.
+Anyone who has looked at computer representations of keyboard characters is familiar with either the ASCII or EBCDIC or Unicode codes.
+In the ASCII code, the encoding of \texttt{A} is 1000001.
+A compound object, that is, an object made of a number of subobjects, can be encoded as a binary string by combining the representations of its constituent parts.
+Polygons, graphs, functions, ordered pairs, programs---all can be encoded as binary strings.
+Thus, every problem can be transformed to the one whose every instance is the encoded instance of the original problem.
+
+Of course, some of encodings are better than others.
+Generally, good encodings used for a particular type of object should be concise and decodable.
+The former means that when encoding instances of a problem we should not use any unnatural ``padding'' that could be used to artificially expand the length of an instance.
+The intent of the latter is that we should be able to specify fast method for transforming the encoded instance to the instance itself.
+In particular, encoding natural numbers in binary is suitable, since we can efficiently transform the encoded string of zeros and ones to the number it represents, and there are no ``paddings'' in the string.
+On the other hand, the unary encoding $\mathit{u}$ (a natural number $n$ is then represented by a sequence of $n+1$ ones) would be problematic, since the transformation between $n$ and $\mathit{u}(n)$ requires $n$ steps.
+Such transformation is much slower than the one which converts $n$ to its binary representation in $\log_2n$ steps.
+Logarithmic functions increase much slower than linear functions, thus representing numbers in binary is more reasonable.
+Our goal is to present an encoding-independent approach to the theory of the computational complexity, but we assume that we use only the good encodings for our problems.
+For an extended discussion about encoding schemes see Garey and Johnson \cite[pp.~18--23]{garey}.
+
+\begin{definition}
+    A computational problem $\Pi$ is a concrete problem, if the set of its instances \,$\mathcal{I}$ is the set of binary strings.
+\end{definition}
+
+In order to define some fundamental notions of computational complexity, we will now focus only on concrete decision problems.
+One of the advantages of this restriction is the ease of use of concepts of the formal language theory.
+Formal languages are very natural, formal counterparts of concrete problems, which are suitable objects to study in a mathematically precise theory of computation.
+They are defined in the following way.
+
+\begin{definition}
+    An alphabet $\Sigma$ is a finite set of symbols.
+	A string is a sequence (finite or not) of symbols from an alphabet.
+	A language $L$ over $\Sigma$ is a set of strings made up of elements from $\Sigma$.
+	We denote the empty string by $\varepsilon$, and the empty language by $\emptyset$.
+	The language of all strings over $\Sigma$ is denoted $\Sigma^*$.
+\end{definition}
+
+\begin{Example}
+    Let us consider an alphabet $\Sigma=\{0,1\}$.
+	The set
+	\[
+	    L = \{10,11,101,111,1011,1101,10001,\dots\}
+	\]
+	is the language over $\Sigma$ containing prime numbers written in binary, and the set
+	\[
+	    \Sigma^* = \{\varepsilon,0,1,00,01,10,11,000,\dots\}
+	\]
+	is the language over $\Sigma$ containing every finite binary sequence.
+	Every language over $\Sigma$ is a subset of $\Sigma^*$.
+\end{Example}
+
+\begin{definition}
+    Let \,$\Sigma$ be an alphabet and let \,$x\in\Sigma^*$ be a string.
+	The length of \,$x$, denoted $|x|$, is the number of symbols in $x$.
+\end{definition}
+
+\begin{Example}
+	We have $|001101|=6$, $|1|=1$, and $|\varepsilon|=0$.
+\end{Example}
+
+From the point of view of the formal language theory, the set of instances for any concrete decision problem $\Pi$ is simply a subset of $\Sigma^*$, where $\Sigma=\{0,1\}$.
+Since $\Pi$ is entirely characterized by those problem instances that produce a ``yes'' answer, we can view $\Pi$ as a language $L$ over $\Sigma=\{0,1\}$, where
+\[
+    L = \{\,x\in\Sigma^*:\Pi(x)=\textnormal{``yes''}\,\}.
+\]
+If a result holds for formal language $L$, then it holds for problem $\Pi$.
+
+\begin{Example} \label{ex:primes}
+	Let us consider the problem $\Pi'$ from Example~\ref{ex:problems}, i.e., the problem of determining whether a natural number is prime or not.
+	We use binary encoding $\mathit{b}$ to transform every instance $n$ of $\Pi'$ to a binary string $\mathit{b}(n)$, and in effect we create a concrete problem $\Pi''$.
+	The language corresponding to $\Pi''$ is
+    \[
+	    \text{PRIMES} = \{\,\mathit{b}(n)\in\{0,1\}^*:\text{$n$ is prime}\}.
+	\]
+\vskip-8mm
+\end{Example}
+
+In order to formalize our notion of an algorithm, we will need to fix a particular model for computation.
+The model we will describe is the \emph{deterministic Turing machine} (DTM).
+It consists of:
+\begin{Enumerate}
+    \item a two-way infinite tape made of cells containing symbols from a given alphabet,
+	\item a head that can read and write symbols in the tape's cells and move the tape left and right one cell at a time, and
+	\item a finite state control responsible for controlling the machine; this mechanism, given the state the machine is currently in and the symbol it is reading on the tape (the symbol currently under the head), tells the machine to do the following in sequence: either erase or write a symbol in the current cell, move the head, assume the same or a new state.
+\end{Enumerate}
+DTMs are not intended as practical computing technology, but can be adapted to si\-mu\-late the logic of any computer algorithm.
+We will now give a formal definition of a DTM.
+
+\begin{definition}
+    A deterministic Turing machine is a 5-tuple $\mathcal{M}=(Q,\Gamma,\Sigma,\delta,q_0)$, where:
+	\begin{Enumerate}
+		\item $Q$ is a finite, non-empty set of states,
+		\item $\Gamma$ is a work alphabet containing $\rhd$ (the final symbol) and $\sqcup$ (the blank symbol),
+		\item $\Sigma\subseteq\Gamma-\{\rhd,\sqcup\}$ is an input alphabet,
+		\item $\delta\colon Q\times\Gamma\mapsto\Gamma\times\{\leftarrow,\rightarrow\}\times(Q\cup\{{\scriptstyle\rm HALT},{\scriptstyle\rm YES},{\scriptstyle\rm NO}\})$ is a transition function, and
+		\item $q_0\in Q$ is the initial state.
+	\end{Enumerate}
+	In addition, we assume that $Q\cap\Gamma=\emptyset$ and $\leftarrow,\rightarrow,{\scriptstyle\rm HALT},{\scriptstyle\rm YES},{\scriptstyle\rm NO}\not\in\Gamma$, and for each $p,q\in Q$, if $\delta(p,\rhd)=(s,d,q)$ then $s=\rhd$ and $d=\;\rightarrow$.
+\end{definition}
+
+We will now discuss this definition and show how a DTM works.
+Let us assume that the machine $\mathcal{M}$ was executed on the string $x\in\Sigma^*$, called the \emph{input}, that was stored in the consecutive cells of the tape, symbol by symbol.
+Directly to the left of the $x$'s first symbol there is a cell containing the symbol $\rhd$, and the other cells on the tape contain the symbol $\sqcup$.
+The machine starts working by setting the head to the cell containing the first symbol of $x$ and by assuming the initial state $q_0$.
+Then it performs the series of steps according to the transition function $\delta$.
+During each step, if the machine is in a state $p\in Q$, the symbol in the current cell (i.e., the cell under the head) is $a\in\Sigma$, and $\delta(p,a)=(b,d,q)$, then it performs the following operations:
+\begin{Enumerate}
+	\item it writes the symbol $b$ in the current cell (the new symbol erases the old one, and writing the blank symbol $\sqcup$ is plain erasing the cell's content),
+	\item it moves the head to the direct cell on the left (if $d=\;\leftarrow$) or to the direct cell on the right (if $d=\;\leftarrow$), and
+	\item it sets a new state $q$.
+\end{Enumerate}
+The restriction of the function $\delta$ from the definition of DTM prevents the head from writing on the cell with $\rhd$ and to the left of it.
+The machine stops if, after the finite number of steps, it is in the state ${\scriptstyle\rm HALT}$, ${\scriptstyle\rm YES}$, or ${\scriptstyle\rm NO}$.
+If this final state is ${\scriptstyle\rm YES}$, we say that $\mathcal{M}$ \emph{accepts} the input string $x$ (we denote this fact by $\mathcal{M}(x)={\scriptstyle\rm YES}$), and if the final state is ${\scriptstyle\rm NO}$, we say that $\mathcal{M}$ \emph{rejects} $x$ (in this case we write $\mathcal{M}(x)={\scriptstyle\rm NO}$).
+Otherwise, ${\scriptstyle\rm HALT}$ was reached, and since the computation has gone on for finitely many steps, the string on the $\mathcal{M}$'s tape at the time of halting consists of a $\rhd$, followed by a finite string $y\in\Sigma^*$, followed by a symbol from $\Gamma-\Sigma$, followed by an infinite sequence of symbols from $\Gamma$.
+We consider string $y$ to be the \emph{output} of the computation, and write $\mathcal{M}(x)=y$.
+
+The transition function $\delta$ defines the DTM's behavior and can be viewed as a formal definition of the notion of a (deterministic) algorithm.
+Thus, every deterministic Turing machine describes an algorithm, and every algorithm represents a deterministic Turing machine.
+We will use these two notions interchangeably.
+
+The following definitions clarify what does it mean to decide a language or to compute a function.
+
+\begin{definition} \label{def:decidability}
+	Let $\mathcal{A}$ be an algorithm represented by a deterministic Turing machine $\mathcal{M}=(Q,\Gamma,\Sigma,\delta,q_0)$ and let $L\subseteq\Sigma^*$ be a language.
+	We say that $\mathcal{A}$ decides language $L$ if, for each string $x\in\Sigma^*$, it holds that $\mathcal{M}(x)={\scriptstyle\rm YES}$, if $x\in L$, and $\mathcal{M}(x)={\scriptstyle\rm NO}$, if $x\not\in L$.
+	For some function $T\colon\mathbb{N}\mapsto\mathbb{N}$ we say that $\mathcal{A}$ decides language $L$ in time $T(n)$, if $\mathcal{A}$ decides $L$ and when it is provided with an input string $x\in\Sigma^*$, it stops after at most $T(|x|)$ steps.
+\end{definition}
+
+\begin{definition} \label{def:computability}
+	Let $\mathcal{A}$ be an algorithm represented by a deterministic Turing machine $\mathcal{M}=(Q,\Gamma,\Sigma,\delta,q_0)$ and let $f\colon\Sigma^*\mapsto\Sigma^*$ be a function.
+	We say that $\mathcal{A}$ computes function $f$ if, for each string $x\in\Sigma^*$, it holds that $\mathcal{M}(x)=y$ if and only if $f(x)=y$.
+	For some function $T\colon\mathbb{N}\mapsto\mathbb{N}$ we say that $\mathcal{A}$ computes function $f$ in time $T(n)$, if $\mathcal{A}$ computes $f$ and when it is provided with an input string $x\in\Sigma^*$, it stops after at most $T(|x|)$ steps.
+\end{definition}
+
+Function $T(n)$ from the definitions above is called a \emph{time complexity} of algorithm $\mathcal{A}$ (or machine $\mathcal{M}$).
+In most cases we are not interested in the exact form of the time complexity.
+In other words, if there is a function $T'(n)$ and a positive number $a$ for which it holds
+\[
+    \lim_{n\to\infty}\frac{T(n)}{T'(n)} = a,
+\]
+we can use $T'(n)$ for algorithm's time complexity instead of $T(n)$.
+For example, if $T(n)$ is a polynomial of degree $k$, we can consider only the leading term of $T(n)$, since the lower-order terms are relatively insignificant for large $n$.
+We also ignore the leading term's constant coefficient, since constant factors are less significant than the rate of growth in determining computational efficiency for large inputs.
+In effect we use $T'(n)=n^k$ instead of $T(n)$.
+Therefore, when studying the complexity of algorithms we use the notations $O$, $\Omega$ and $\Theta$ that we described in the previous section.
+
+We are particularly interested in the case when the time complexity of an algorithm is a polynomial of the input string's length.
+These algorithms form the complexity class~\Pclass, whose formal definition is as follows:
+\begin{align*}
+    \Pclass = \bigl\{\,L\subseteq\{0,1\}^*:\;&\text{there exists an algorithm $\mathcal{A}$} \\
+	& \text{that decides $L$ in polynomial time}\,\bigr\}.
+\end{align*}
+
+Generally, we think of problems that are solvable by polynomial-time algorithms (i.e., languages from \Pclass) as being tractable, or easy, and problems that require superpolynomial time as being intractable, or hard.
+Although it is reasonable to regard a problem of time boundary $T(n)=O(n^{100})$ as intractable, there are very few practical problems that require time on the order of such a high-degree polynomial.
+Experience has shown that once a polynomial-time algorithm for a problem is discovered, it is likely that an algorithm with a much better running time will soon be discovered.
+
+In this thesis we describe algorithms not by giving the whole configuration of Turing machines that implement them, but rather we write them in a \emph{pseudocode} designed to present each algorithm clearly and succinctly and to be readable by anyone familiar with computer programming.
+Although we use the natural English language in many situations when writing in pseudocode, its translation into most modern structured programming languages is a fairly straightforward task.
+
+\begin{Example}
+	Let us consider the following algorithm written in pseudocode:
+	\begin{codebox}
+	\Procname{$\proc{Is-Prime}(n)$}
+	\li	\If $n=0$ or $n=1$
+	\li		\Then \Return ``no''
+			\End
+	\li	\For $k=2$ \To $\lfloor\!\sqrt{n}\rfloor$
+	\li		\Do
+				\If $n$ is evenly divisible by $k$ \label{alg:test}
+	\li				\Then \Return ``no''
+					\End
+			\End
+	\li	\Return ``yes''
+	\end{codebox}
+	The reader can easily check the algorithm solves problem $\Pi''$ (or decides language $\text{PRIMES}$) from Example~\ref{ex:primes}.
+	Since $n$ is a natural number encoded in binary, it consists of $m=\lfloor\log_2n\rfloor+1$ bits, and $\lfloor\!\sqrt{n}\rfloor$ encoded in binary consists of $\lfloor\log_2\lfloor\!\sqrt{n}\rfloor\rfloor+1<(\log_2n)/2=O(m)$ bits.
+	Hence, the test in line~\ref{alg:test} is executed $O(2^m)$ times, and the time complexity of this algorithm is exponential.
+	
+	Of course, there are other algorithms which solve $\Pi''$ and that differ in computational complexity.
+	In particular, Agrawal, Kayal, and Saxena \cite{agrawal} invented polynomial-time primality test, therefore we can write $\text{PRIMES}\in\Pclass$.
+\end{Example}
+
+Let us now move on to the \emph{non-deterministic} version of Turing machines (NDTM).
+
+\begin{definition}
+    A non-deterministic Turing machine is a 5-tuple $\mathcal{N}=(Q,\Gamma,\Sigma,\Delta,q_0)$, where $Q$, $\Gamma$, $\Sigma$ and $q_0$ have the same meaning as in the definition of deterministic Turing machine, and $\Delta\subseteq(Q\times\Gamma)\times(\Gamma\times\{\leftarrow,\rightarrow\}\times(Q\cup\{{\scriptstyle\rm HALT},{\scriptstyle\rm YES},{\scriptstyle\rm NO}\}))$ is a transition relation.
+	In addition, we assume that $Q\cap\Gamma=\emptyset$ and $\leftarrow,\rightarrow,{\scriptstyle\rm HALT},{\scriptstyle\rm YES},{\scriptstyle\rm NO}\not\in\Gamma$, and for each $p,q\in Q$, if $((p,\rhd),(s,d,q))\in\Delta$ then $s=\rhd$ and $d=\;\rightarrow$.
+\end{definition}
+
+The main difference between DTM and NDTM is that the latter is able to choose the way the computation will go, since given the current state and the symbol in the current cell, there can be more than one possibility specified what the next step may be.
+An NDTM \emph{accepts} an input string if there is some sequence of non-deterministic choices that results in ${\scriptstyle\rm YES}$ state.
+An NDTM \emph{rejects} an input string only if no sequence of choices can lead to acceptance.
+This ``asymmetry'' in the way ``yes'' and ``no'' instances are treated in non-deterministic machines is the reason why such machines are so powerful.
+
+Every NDTM constitutes a definition of a \emph{non-deterministic algorithm} similarly as it is for DTMs and deterministic algorithms.
+Definition~\ref{def:decidability} remains true if we redefine $\mathcal{A}$ to be a non-deterministic algorithm represented by NDTM $\mathcal{N}=(Q,\Gamma,\Sigma,\Delta,q_0)$.
+We consider the analogous class of problems solvable (i.e., the class of languages decided) in polynomial-time on NDTM.
+Its definition is as follows:
+\begin{align*}
+    \NPclass = \bigl\{\,L\subseteq\{0,1\}^*:\;&\text{there exists a non-deterministic algorithm $\mathcal{A}$} \\
+	& \text{that decides $L$ in polynomial time}\,\bigr\}.
+\end{align*}
+
+Of course, every transition function from the definition of DTM is a transition relation from the definition of NDTM.
+Thus, every deterministic Turing machine is a non-deterministic Turing machine.
+From this observation we have that $\Pclass\subseteq\NPclass$.
+If the opposite inclusion is true we would have that $\Pclass=\NPclass$, but this question, so-called ``$\Pclass\stackrel{?}{=}\NPclass$ problem'', is one of the deepest open research problems in theoretical computer science.
+For the discussion about what the consequences of any solution to this problem would be, and the recent status of its exploration, see the paper of Fortnow \cite{fortnow}.
+
+We will now formalize the notion of reducing one problem to another.
+Intuitively, a problem $\Pi$ can be reduced to another problem $\Pi'$ if any instance of $\Pi$ can be ``easily rephrased'' as an instance of $\Pi'$, the solution to which provides a solution to the instance of $\Pi$.
+
+\begin{definition}
+	Let $\Sigma=\{0,1\}$ be an alphabet and let $L_1$\! and $L_2$\! be languages over $\Sigma$.
+    Language $L_1$\! reduces in polynomial-time to $L_2$, denoted $L_1\le_\Pclass L_2$, if there exists a polynomial-time computable function $f\colon\Sigma^*\mapsto\Sigma^*$ such that, for all $x\in\Sigma^*$, $x\in L_1$\! if and only if $f(x)\in L_2$.
+\end{definition}
+
+Polynomial-time reductions give us a powerful tool for proving that various problems belong to \Pclass.
+For example, let $L_2\in\Pclass$.
+If $L_1\le_\Pclass L_2$, it holds that $L_1\in\Pclass$, because we can transform $L_1$ to $L_2$ using polynomial-time reduction and solve $L_2$ in polynomial-time.
+In other words polynomial-time reductions provide a formal means for showing that one problem is at least as hard as another, to within a polynomial-time factor.
+
+We can now define a set of \NPclass-complete languages which are the hardest problems in \NPclass.
+
+\begin{definition}
+    A language $L\subseteq\{0,1\}^*$ is \NPclass-complete, if
+	\begin{Enumerate}
+		\item $L\in\NPclass$, and
+		\item $L'\le_\Pclass L$ for every $L'\in\NPclass$.
+	\end{Enumerate}
+	If a language $L$ satisfies property 2, but not necessarily property 1, we say that $L$ is \NPclass-hard.
+\end{definition}
+
+Once we find a polynomial-time algorithm for any \NPclass-complete problem, we will automatically receive polynomial-time algorithms for each problem in this class, and it will be a positive answer to the $\Pclass\stackrel{?}{=}\NPclass$ problem.
+For decades these problems were unsuccessfully attacked by many researchers, it is therefore believed that fast algorithms that solve \NPclass-complete problems do not exist.
+
+We will need a notion of \emph{oracle machine}.
+It can be visualized as a deterministic Turing machine with a black box, called an oracle, which is thought of as an entity capable of answering some collection of questions.
+An oracle machine is able to solve decision problem $\Pi$ in a single operation, no matter how hard $\Pi$ is (i.e., $\Pi$ can be of any complexity class).
+
+Let us define a complexity class which is not as popular as \Pclass\ or \NPclass, but we need it to precisely describe some properties of elections.
+This class is denoted by $\Theta_2^p$ and it consists of problems which can be solved in polynomial time on a deterministic Turing machine with an oracle for a problem in \NPclass, by $O(\log_2n)$ queries to the oracle (where $n$ is the size of input).
+A problem $\Pi$ is \emph{$\Theta_2^p$-complete}, if it belongs to $\Theta_2^p$, and every problem in $\Theta_2^p$ reduces to $\Pi$ in polynomial-time.
+
+Let us now move on to function problems.
+We start by giving a definition of the complexity class of ``easy'' function problems which is analogous to class \Pclass:
+\begin{align*}
+    \FPclass = \bigl\{\,f\colon\{0,1\}^*\mapsto\{0,1\}^*:\;&\text{there exists an algorithm $\mathcal{A}$} \\
+	& \text{that computes $f$ in polynomial time}\,\bigr\}.
+\end{align*}
+
+Let $\Pi$ be some decision problem where, for each instance $I$, we ask if there exists some mathematical object satisfying a given condition.
+The \emph{counting variant} of $\Pi$ is denoted $\textnormal{\#}\Pi$.
+It is an example of a function problem, in which we ask how many given mathematical objects exist.
+For example, consider the following definition.
+
+\begin{definition} \label{def:sharpXthreeC}
+    An instance of \textnormal{X3C} is a pair $(B,\mathcal{S})$, where $B=\{b_1,\dots,b_{3k}\}$ and \,$\mathcal{S}=\{S_1,\dots,S_n\}$ is a family of 3-element subsets of $B$.
+	In \textnormal{X3C} we ask if it is possible to find exactly $k$ sets is \,$\mathcal{S}$ whose union is exactly $B$.
+	In \sharpXthreeC\ we ask how many $k$-element subsets of \,$\mathcal{S}$ have $B$ as their union.
+\end{definition}
+
+The full name of X3C problem is \emph{exact 3-set cover}.
+It is known to be \NPclass-complete (see Garey and Johnson \cite{garey}).
+
+The complexity class \sharpPclass\ is the set of such counting problems $\textnormal{\#}\Pi$ for which there is a polynomial-time NDTM that accepts on as many paths as many solutions there are for $\Pi$.
+Before specifying what does it mean for a counting problem to be \sharpPclass-complete, let us define the notion of reduction between counting problems.
+It is similar but more subtle than the notion of reduction between decision problems.
+
+\begin{definition}
+    Let $\textnormal{\#}\Pi_1$ \!and $\textnormal{\#}\Pi_2$ \!be two counting problems.
+	We say that $\textnormal{\#}\Pi_1$ parsimoniously reduces to $\textnormal{\#}\Pi_2$, denoted $\textnormal{\#}\Pi_1\!\le_\textnormal{par}\!\textnormal{\#}\Pi_2$, if there exists a function $f\in\FPclass$ such that for each instance $I$ \!of \,$\textnormal{\#}\Pi_1$ \!the following two conditions hold:
+	\begin{Enumerate}
+		\item $f(I)$ is an instance of \,$\textnormal{\#}\Pi_2$, and
+		\item $I$ has exactly as many solutions as $f(I)$.
+	\end{Enumerate}
+\end{definition}
+
+The definition above is a basis of the notion of \sharpPclass-completeness.
+
+\begin{definition} \label{def:sharpPcomplete}
+	We say that a counting problem $\textnormal{\#}\Pi$ is \sharpPclass-parsimonious-complete, if
+	\begin{Enumerate}
+		\item $\textnormal{\#}\Pi\in\sharpPclass$, and
+		\item $\textnormal{\#}\Pi'\le_\textnormal{par}\!\textnormal{\#}\Pi$ for every $\textnormal{\#}\Pi'\in\sharpPclass$.
+	\end{Enumerate}
+	If $\textnormal{\#}\Pi$ satisfies property~2, but not necessarily property~1, we say that $\textnormal{\#}\Pi$ is \sharpPclass-parsimonious-hard.
+\end{definition}
+
+Many counting problems are \sharpPclass-parsimonious-complete if their decision variants are \NPclass-complete.
+\sharpXthreeC\ is an example of a problem with such property.
+However, it is not a rule, as parsimonious reductions are quite restrictive and the class of \sharpPclass-parsimonious-complete problems is not as wide as the class of \NPclass-complete problems.
+Different authors sometimes use different reduction types to define \sharpPclass-completeness and \sharpPclass-hardness.
+For example, Zank\'o \cite{zanko} used many-one reductions, Krentel \cite{krentel} used metric reductions, and Valiant \cite{valiant} used Turing reductions.
+These definitions are given below.
+
+\begin{definition}[Zank\'o]
+    Let $\textnormal{\#}\Pi_1$ \!and $\textnormal{\#}\Pi_2$ \!be two counting problems.
+	We say that $\textnormal{\#}\Pi_1$ many-one reduces to $\textnormal{\#}\Pi_2$, denoted $\textnormal{\#}\Pi_1\!\le_\textnormal{m}\!\textnormal{\#}\Pi_2$, if there exist functions $f$, $g\in\FPclass$ such that for each instance $I$ \!of \,$\textnormal{\#}\Pi_1$ \!the following two conditions hold:
+	\begin{Enumerate}
+		\item $f(I)$ is an instance of \,$\textnormal{\#}\Pi_2$, and
+		\item if $s_I$ is the number of solutions of $f(I)$, $I$ has exactly $g(s_I)$ solutions.
+	\end{Enumerate}
+\end{definition}
+
+\begin{definition}[Krentel]
+    Let $\textnormal{\#}\Pi_1$ \!and $\textnormal{\#}\Pi_2$ \!be two counting problems.
+	We say that $\textnormal{\#}\Pi_1$ \!metrically reduces to $\textnormal{\#}\Pi_2$, denoted $\textnormal{\#}\Pi_1\!\le_{1-T}\!\textnormal{\#}\Pi_2$, if there exist functions $f$, $g\in\FPclass$ such that for each instance $I$ \!of \,$\textnormal{\#}\Pi_1$ \!the following two conditions hold:
+	\begin{Enumerate}
+		\item $f(I)$ is an instance of \,$\textnormal{\#}\Pi_2$, and
+		\item if $s_I$ is the number of solutions of $f(I)$, $I$ has exactly $g(I,s_I)$ solutions.
+	\end{Enumerate}
+\end{definition}
+
+\begin{definition}[Valiant]
+    Let $\textnormal{\#}\Pi_1$ \!and $\textnormal{\#}\Pi_2$ \!be two counting problems.
+	We say that $\textnormal{\#}\Pi_1$ \!is Turing reducible to $\textnormal{\#}\Pi_2$, denoted $\textnormal{\#}\Pi_1\!\le_T\!\textnormal{\#}\Pi_2$, if there is an oracle machine that computes $\textnormal{\#}\Pi_1$ \!with $\textnormal{\#}\Pi_2$ \!as the oracle.
+\end{definition}
+
+The meaning of \sharpPclass-completeness and \sharpPclass-hardness in the context of each type of reduction is similar to that from Definition~\ref{def:sharpPcomplete} in which the property~2 has been changed appropriately.
+Parsimonious reduction is stronger than many-one reduction, which is stronger than metric reduction, which in turn is stronger than Turing reduction.
+In other words, if $\textnormal{\#}\Pi_1\!\le_\textnormal{par}\!\textnormal{\#}\Pi_2$ then $\textnormal{\#}\Pi_1\!\le_\textnormal{m}\!\textnormal{\#}\Pi_2$, and so on.
+It means that for example the class of \sharpPclass-parsimonious-complete problems lies within class of \sharpPclass-many-one-complete problems and, provided that $\FPclass\ne\sharpPclass$, these inclusions are strict (see \cite{faliszewski11} for an argument).

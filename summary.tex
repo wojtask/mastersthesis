@@ -1,0 +1,46 @@
+\chapter{Summary} \label{ch:summary}
+
+In this thesis, we have considered a natural model of predicting election winners in settings where there is uncertainty regarding the structure of the election (i.e., regarding the exact set of candidates and the exact collection of voters participating in the election).
+We have shown that our model corresponds to counting variants of election control problems (specifically, we have focused on election control by adding/deleting candidates and voters).
+
+We have considered four voting rules: plurality, approval, Condorcet, and maximin voting.
+It turned out that the complexity of counting the number of solutions for constructive control problems under plurality, approval, and Condorcet systems is analogous to the complexity of verifying if any solution exists.
+That is, whenever the decision va\-riant of the constructive problem is in \Pclass, the counting variant is in \FPclass; whenever the decision variant is \NPclass-complete, the counting variant is \sharpPclass-complete.
+Only in ma\-xi\-min system things may be slightly different---we believe the problem regarding deleting candidates (both constructive and destructive cases) in the decision variant is computationally easy, while in the counting variant it is computationally hard.
+
+Table~\ref{tab:results} gathers all the results we have collected in the previous chapters.
+In the first two columns we can observe some symmetry, as approval and Condorcet voting have identical results, and plurality voting looks like the opposite to them---altering the set of candidates is computationally hard and altering the collection of voters is computationally easy---unlike it is for approval and Condorcet.
+What is interesting, maximin has \sharpPclass-completeness in every considered case---every election control problem in counting variant is computationally hard under this system (however, in case of deleting candidates it is only a conjecture).
+It means that the winner cannot be predicted quickly under maximin voting no matter if we add or delete voters, or if we add or delete candidates (assuming Conjectures~\ref{cj:mmdcc} and \ref{cj:mmdcd}).
+
+\begin{table}[ht!]
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			Problem & Plurality & Approval/Condorcet & Maximin \\
+			\hline \hline
+			\textnormal{\#AC${}_\textnormal{C}$}-\textsc{Control} & \sharpPclass-p-complete & -- & \sharpPclass-p-complete \\
+			\hline
+			\textnormal{\#AC${}_\textnormal{D}$}-\textsc{Control} & \sharpPclass-m-complete & \FPclass & \sharpPclass-m-complete \\
+			\hline
+			\textnormal{\#DC${}_\textnormal{C}$}-\textsc{Control} & \sharpPclass-p-complete & \FPclass & \sharpPclass-p-complete (?) \\
+			\hline
+			\textnormal{\#DC${}_\textnormal{D}$}-\textsc{Control} & \sharpPclass-m-complete & -- & \sharpPclass-m-complete (?) \\
+			\hline
+			\textnormal{\#AV${}_\textnormal{C}$}-\textsc{Control} & \FPclass & \sharpPclass-p-complete & \sharpPclass-p-complete \\
+			\hline
+			\textnormal{\#AV${}_\textnormal{D}$}-\textsc{Control} & \FPclass & \sharpPclass-m-complete & \sharpPclass-m-complete \\
+			\hline
+			\textnormal{\#DV${}_\textnormal{C}$}-\textsc{Control} & \FPclass & \sharpPclass-p-complete & \sharpPclass-p-complete \\
+			\hline
+			\textnormal{\#DV${}_\textnormal{D}$}-\textsc{Control} & \FPclass & \sharpPclass-m-complete & \sharpPclass-m-complete \\
+			\hline
+		\end{tabular}
+		\caption{The complexity of counting variants of control problems. A dash in an entry means that the given system is immune to the type of control in question, \sharpPclass-p-complete stands for \sharpPclass-parsimonious-complete, and \sharpPclass-m-complete stands for \sharpPclass-metric-complete. An entry with a question mark means that the given result has not been proven, although we conjecture it holds.} \label{tab:results}
+	\end{center}
+\end{table}
+
+Our research can be further extended in many ways.
+The most natural research direction currently is to study counting variants of control under further election systems, and to provide proofs that will more accurately characterize our \sharpPclass-metric-complete problems---whether or not these problems belong to a narrower class of \sharpPclass-completeness.
+One could also consider more involved probability distributions of candidates/voters that join/leave the election, as the restrictions we assumed in this work are very rigid.
+Another approach to winner prediction problem would be to conduct experiments and computer simulations (e.g., on some special cases), as well as to design heuristic methods and approximation algorithms to deal with \sharpPclass-completeness.

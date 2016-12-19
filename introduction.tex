@@ -1,0 +1,218 @@
+\chapter{Introduction} \label{ch:introduction}
+
+In this thesis we discuss some new results relating to computational aspects of elections.
+The main motivation of this work is to develop techniques of predicting winners in elections and we show this problem can be reduced to the counting variants of election control problems.
+For this reason we consider the computational complexity of the counting variants of certain types of control under several important voting systems.
+We formulate each problem we consider and for each problem and election system under consideration we provide a mathematical proof that either it can be solved in polynomial time, or that the problem is \sharpPclass-complete and thus it is very unlikely that a fast solution exists.
+In the first situation, we also describe and construct an algorithm that solves the problem.
+
+Some of the results from this thesis have been presented at IJCAI 2011 Workshop on Social Choice and Artificial Intelligence in \cite{faliszewski4}.
+
+\section{What are Elections?} \label{sec:what-are-elections}
+
+Elections are natural tools when a group of people---or agents in a multi-agent system---must decide which option to choose from a given set of alternatives.
+The group may contain a large number of participants, who typically disagree which alternative(s) are more desirable than others.
+This requires the group to aggregate the preferences of the individuals to reach a decision which is acceptable to the members of the society as a whole.
+Often, these preference aggregation systems involve some form of voting, and such process is particularly important in this work.
+We will call the members of the group that participate in the voting \emph{voters}, and we will call the alternatives from which they choose \emph{candidates}.
+
+The main purpose of an election is the determination of---informally speaking---the most acceptable candidate, which is termed as a \emph{winner} of the election.
+In some circumstances there is not only a single winner but a group of winners, each equally appropriate.
+
+In an ideal world elections should be fair.
+Every participant of an election should be able to vote for a candidate of their choice, and each single vote should be worth the same.
+Thus, groups use \emph{voting systems}, in which the winner(s) are determined in an algorithmic manner.
+We will now informally introduce some key concepts of the model we will use.
+First, in some fashion a set of valid candidates is generated.
+Each voter is given the list of candidates and reports his preferences over these candidates.
+In almost all the elections we will discuss, a vote is simply an ordered list of all the candidates from the most desirable one to the least desirable one.
+Once the preferences are collected, some rule is used to combine them into a final result, i.e., a set of one or more winners or even no winners at all.
+The empty set of winners may happen in some special cases, e.g., when every candidate gains the same rate of support from the voters and no one is clearly the leader.
+
+There are many different voting systems, each coming with different advantages and disadvantages.
+Probably the most common one is plurality voting, in which voters are asked only for their first preference, and the alternative which receives the greatest number of votes wins.
+One can also consider veto voting, which can be viewed as a dual system to plurality---each voter specifies the least desirable candidate and the winner is the one who gained the least number of votes.
+Other common systems include the single transferable vote (or instant runoff), which repeatedly eliminates the candidate with the least number of first preferences, and reassigns the votes to the voters' next-highest preferences, until only the desired number of winners is left.
+Another system is approval voting, in which, rather than ranking candidates, voters indicate whether or not they approve of each candidate.
+The winner(s) are the candidate(s) with the highest number of voters approving of them.
+In the Condorcet voting a candidate is a winner exactly if he beats each other candidate in a head-to-head contest under the voters' preferences.
+This means that in order to be a winner, a candidate must be preferred to each other candidate by more than half of the voters (however, not necessarily the same voters for each of the candidates).
+Thus, there can be a situation in which we do not have a Condorcet winner.
+
+The mystic and philosopher Ramon Llull defined the Llull system in the 13th century.
+In this system one considers each pair of candidates and awards one point to the winner of the head-to-head contest, and if the head-to-head contest is a tie, each still gets one point.
+A similar voting scheme to Llull is Copeland, in which one also performs head-to-head contest between each pair of candidates, and in case of a tie each candidate of the pair gets half a point.
+The Llull/Copeland system is used in the group stage of the World Cup soccer tournament, except there (after rescalling) wins get one point and ties get one third of a point.
+
+We have chosen several well-known and well-studied voting systems, and in this work we examine their computational complexity regarding some problems on elections.
+The formal definitions of the voting systems, as well as those regarding problems in elections, will be presented in Chapter~\ref{ch:elections}.
+
+\section{Applications of Voting} \label{sec:applications}
+
+It turns out that a large number of situations (both theoretical and practical) can be described in terms of voting.
+The most obvious examples are political elections which are used as a tool for selecting representatives in democratic countries or other administrative units.
+In many countries presidential and parliamentary elections are performed every few years and millions of people choose one person or party from several pos\-si\-bi\-li\-ties.
+Also, within states, regions, or provinces, local government authorities are chosen regularly and by their structure these elections resemble presidential elections, although in this case there are significantly fewer voters.
+
+In political elections it may often be the case that voters are not informed about every candidate, or feel relatively neutral about their ``middle'' preferences.
+In particular, they may strongly like or dislike only one, or a few candidates.
+In these cases protocols such as plurality or veto voting may be reasonable models.
+
+Very similar to the political elections are those performed in companies, organizations, clubs, and by other groups of people, both large and small, formal and informal.
+Members of such groups can elect a new leader, a new budget plan, a new logo, new company objectives (e.g., whether or not to merge with another company), etc.
+Compared with the political elections, there are still a few possibilities to choose but the number of voters does not exceed several thousand; in small groups there can be even below a hundred of them.
+
+As we can see, many important decisions involve elections and voting, but they are widely used not only in high-impact situations, but also in more frivolous ones.
+Suppose a radio station needs to determine the most popular song of the month.
+A good idea is to organize a contest where listeners can vote on songs (e.g., via text messages) from a list of recent ones.
+This list can be fixed by the organizers, or there can be a possibility to modify the list by adding new songs during the contest if it turns out that a large number of people like them and want to promote them.
+One can also imagine situations in which the list of songs is fixed, but every day after ranking the songs by the listeners, the song with the lowest score is rejected.
+The one which remains on the list until the end of the contest becomes the most popular song of the month.
+The elimination of the alternatives is also popular in game shows---every series of the show introduces a new group of contestants and in every subsequent episode of the series the next contestant is eliminated.
+In these examples of voting the set of candidates is not fixed.
+In fact, neither is the set of voters, since one particular person may not vote in each round of the elimination.
+From the point of view of theory of elections, this kind of voting is interesting since we must allow for both sets to vary.
+
+In the previous examples the set of voters and/or the set of candidates consist of humans.
+Also, there were always significantly more voters than candidates.
+However, one can consider systems in which both voters and candidates are not humans but intelligent software agents that learn and use knowledge to achieve their goals.
+In these settings, it is reasonable to speak of an election of arbitrary numbers of candidates (and perhaps relatively few voters).
+For example, a financial professional may have to decide between thousands of possible stock purchases (candidates), each of which may be ranked differently by each of dozens or hundreds of experts and computer programs (voters).
+
+Using voting theory, Ephrati and Rosenschein \cite{ephrati} present a new approach to deriving multi-agent plans.
+They consider the situation where autonomous agents attempt to coordinate action and how they could reach consensus using a voting mechanism.
+The authors introduce a new multi-agent planning technique that makes use of a dynamic, iterative search procedure.
+Each agent expresses its preferences, and a group choice mechanism is used to select the result.
+At each step, agents vote about the next joint action in the group plan (i.e., what the next transition state will be in the e\-mer\-ging plan).
+Using this technique agents need not fully reveal their preferences, and the set of alternative final states need not be generated in advance.
+Since each agent has its own private goal and all agents operate in the same environment and may share resources, it is desirable that they agree on a joint plan for the group that will transform the world to an agreed final state.
+
+In the context of the Web, the main applications of voting include building meta-search engines, combining ranking functions, selecting documents based on multiple criteria, and improving search precision through word associations.
+For example, Dwork et al.\ \cite{dwork} propose the use of voting to combine search results from various sources from the Web.
+Given the particular query, one creates an election in which every Web page from the search space acts as a candidate, and every search engine acts as a voter.
+Note that in contrast to the social choice scenario where there are many voters and relatively few candidates, in the Web aggregation scenario there are many candidates and relatively few voters.
+The authors develop a set of techniques that involve the model of voting for the rank aggregation problem and compare their performance to that of well-known methods.
+A primary goal of their work is to design rank aggregation techniques that can simply, efficiently and effectively combat ``spam'', which is a serious problem in Web searches.
+
+Recommender systems apply data mining techniques and prediction algorithms to predict users' interest in knowledge, products, and services among the tremendous amount of available items.
+The vast growth of the amount of information on the Internet as well as the number of visitors on websites add some serious challenges to recommender systems, such as producing accurate recommendation, handling many re\-com\-men\-da\-tions efficiently and coping with the vast growth of number of participants in the system.
+Therefore, new recommender system technologies are needed that can quickly produce high quality recommendations even for huge data sets.
+For example, Ghosh et al.\ \cite{ghosh} designed an automated movie recommendation system, in which the conflicting preferences a user may have about movies were represented as agents, and movies to be suggested were selected according to a voting scheme (in this example there are multiple winners, as several movies are recommended to the user).
+
+As one could notice, elections appear in many real-world applications, thus it is clear they are important not only for humans, but they are also often used in computer environments.
+In the next section we take a look at the challenges concerning elections and how we can deal with them using computational complexity theory.
+
+\section{Problems with Elections} \label{sec:problems}
+
+There are many interesting algorithmic problems that arise when we study elections.
+As we could see in the previous section, the election outcomes often involve important matters such as who will be the next political leader or how huge amounts of money will be spent.
+Thus, it is reasonable to assume that in some cases individuals will attempt to interfere with voting procedures, or will vote dishonestly, in order to gain a personal advantage or to have more influence on the result.
+The three main types of attacks, studied within computational social choice literature, aimed on altering an election in order to change its outcome are: control, manipulation, and bribery.
+We discuss them in the next paragraphs.
+
+The situation where election authorities may alter the election structure to change the results, without changing how voters choose to vote, is called \emph{control}.
+In election control some actor (traditionally called ``the chair'') who has complete knowledge of all the votes seeks to achieve a desired outcome via changing the structure of the election.
+There are several varieties of control problems; those proposed by Bartholdi, Tovey, and Trick \cite{bartholdi2} are: adding or deleting candidates, adding or deleting voters, and partitioning candidates or voters into a 2-round election structure.
+When attempting to control, one could try to make a particular candidate become the winner of an election or to make a certain candidate lose an election.
+The former way, introduced in \cite{bartholdi2}, is called \emph{constructive case}, and the latter is called \emph{destructive case}.
+The destructive cases of control problems have been defined and studied by Hemaspaandra, Hemaspaandra, and Rothe \cite{hemaspaandra} under several voting systems.
+We will describe the types of control that we focus on in greater detail in Chapter~\ref{ch:elections}.
+
+As a real-life example, consider the 2000 U.S.\ Presidential election.
+If one wanted George W.\ Bush to win (and Ralph Nader was not at that time running), he or she might have chosen to add the candidate Ralph Nader which would split votes away from Al Gore and achieve one's desired outcome.
+Bush defeated Gore by 537 votes.
+Nader received 97,421 votes, which led to claims that he did play a pivotal role in determining who would become the president.
+
+If individual voters or some coalition of voters (termed manipulators) cast votes which do not honestly represent their preferences, but which lead to a more favorable outcome (e.g., in which a designated candidate is a winner), we refer to this as \emph{manipulation}.
+Like control, this problem comes in two versions: constructive and destructive.
+One can also consider the model in which each voter has a non-negative integer weight determining his importance in an election.
+It turns out, after Gibbard-Satterthwaite theorem \cite{gibbard,satterthwaite}, that every voting system can be manipulated, unless there is some candidate who can never win, or the system is dictatorial (i.e., there is a single individual who can choose the winner).
+
+We describe an example scenario which emphasizes what is manipulation capable of.
+Consider an election in which voters vote on three options, say $a$, $b$ and $c$, and they are split quite evenly between $a$ and $b$, with a small minority of voters who prefer $c$ most.
+Nonetheless, about half of the voters prefers $a$ to $b$ and $b$ to $c$ (which we denote $a\succ b\succ c$), and about half are the other way round---they prefer $b$ to $a$ and $a$ to $c$ ($b\succ a\succ c$).
+The voting rule we use is called Borda count: We give 2 points to our top choice, 1 point to our middle, and 0 points to the worst.
+In order to make candidate $a$ a winner, some of his supporters could assume the following strategy: Why vote $a\succ b\succ c$ and give
+the point to $b$, when $c$ is not winning anyway?
+So they change their preferences to be $a\succ c\succ b$.
+But in effect candidate $c$ collects enough points to beat both $a$ and $b$ which was clearly not the manipulators' goal.
+
+Finally, it is possible that an alteration of how voters vote is accomplished by bribing the voters.
+\emph{Bribery}, as defined by Faliszewski, Hemaspaandra, and Hemaspaandra \cite{faliszewski9}, is a natural extension of manipulation.
+We assume the actor performing the attack---called briber---has a certain budget, and the voters each have a price for which their vote can be bought.
+The question is whether the briber can make a preferred candidate be a winner by buying the votes and altering them appropriately while not exceeding the budget.
+Like some types of control one has to choose which collection of voters to act on, but like manipulation one is altering votes.
+
+When we go for shopping we act as voters when choosing from a variety of similar products.
+It is common practice when a producer sells their products with some gadgets inside to attract customers and make them choose the particular brand.
+Because those gadgets are usually for free and customers pay only for the product itself, more of these products are sold and their trademark is therefore well-remembered by customers.
+It turns out we are bribed almost every day.
+
+Bartholdi, Tovey, and Trick \cite{bartholdi2,bartholdi3} initiated a line of research whose goal is to protect elections from various attacking actions intended to change their results.
+Their strategy for achieving this goal was to prevent attacking by using computational complexity.
+They show that for various election systems and attacking actions, even seeing whether for a given collection of votes an attack is possible is \NPclass-complete.
+Such systems are referred to as \emph{resistant}.
+Along with \emph{vulnerable} systems that can be attacked using polynomial-time algorithms, they form a class of \emph{susceptible} election systems.
+Every susceptible system can be attacked given enough time.
+
+It would be ideal if we could design voting systems that are \emph{immune} to described types of attacks (which means an attack would be impossible to accomplish), or at least that such systems would be resistant to many types of attacks.
+For example, Copeland and Llull systems have a great number of resistances to constructive control \cite{faliszewski10}.
+Hemaspaandra, Hemaspaandra, and Rothe \cite{hemaspaandra5} constructed a hybrid voting system which is resistant to every control type mentioned in the previous paragraphs.
+However, such hybridization is artificial and impractical for most applications.
+Thus, at best we can seek to find a voting system, for which such attacks are either impossible to accomplish or computationally infeasible to determine how to accomplish, only in certain cases.
+
+Many voting schemes have been considered to see their susceptibility and resistance to various types of control.
+Hemaspaandra, Hemaspaandra, and Rothe \cite{hemaspaandra} study approval voting and destructive versions of plurality and Condorcet.
+Control and bribery properties of Llull and Copeland systems are discussed by Faliszewski et al.\ \cite{faliszewski10}.
+Tideman \cite{tideman}, and Elkind, Faliszewski, and Slinko \cite{elkind} also consider such tricks as candidate cloning.
+In this model a manipulator can replace each candidate by one or more clones in order to make its most preferred candidate (or one of its ``clones'') win the election.
+Multimode control attacks, i.e., a single control attack with multiple standard types of control combined, are studied by Faliszewski, Hemaspaandra, and Hemaspaandra \cite{faliszewski3}.
+Manipulation has been studied under numerous voting systems, in both constructive and destructive situations, and where the voters are weighted.
+The study of the complexity of manipulation for the unweighted case for some voting systems was initiated by Bartholdi, Tovey, and Trick \cite{bartholdi3} and was continued by Conitzer, Lang, and Sandholm \cite{conitzer} who discuss how many candidates it takes for manipulation to become \NPclass-complete for various voting systems in the weighted case.
+In \cite{hemaspaandra4} Hemaspaandra and Hemaspaandra present a dichotomy theorem regarding the complexity of manipulation for a class of voting rules called scoring protocols.
+Fa\-li\-sze\-wski, Hemaspaandra, and Hemaspaandra \cite{faliszewski5}\footnote{The conference version of this paper is from 2006.} initiated the study of bri\-be\-ry from a computational complexity point of view.
+They find the complexity of bribery for many variations, such as weighted voters and varying voters' prices, and under a number of voting systems.
+We point the reader to the works of Faliszewski et al.\ \cite{faliszewski2}, and Faliszewski and Procaccia \cite{faliszewski8}, which are general references on the subject of the complexity of manipulating elections.
+
+Many other problems involving elections are not focused on attacking them.
+For example, even the winner determination can be a non-trivial challenge that in some circumstances has been proven not to be solvable in polynomial time (under standard complexity theoretic assumptions such as $\Pclass\ne\NPclass$).
+In other words, for some specific voting systems given all parameters of the particular election, there is no fast algorithm which will tell us the outcome of the election.
+That means that for many practical applications described in the previous section, due to large sizes of voter set and/or candidate set it is next to impossible to tell what the result of an election is.
+
+In this work we do not study such bizarre cases.
+However, we point the readers to the papers of Faliszewski et al.\ \cite{faliszewski} and \cite{faliszewski2}.
+The work of Bartholdi, Tovey, and Trick \cite{bartholdi} is one of the first pieces of research on this subject in which the authors discuss the winner determination problem and show its \NPclass-hardness for two voting schemes: Dodgson and Kemeny.
+Dodgson voting system is further studied by Hemaspaandra, Hemaspaandra, and Rothe \cite{hemaspaandra2} with a result that the winner determination is $\Theta_2^p$-complete.
+Hemaspaandra, Spakowski, and Vogel \cite{hemaspaandra3} proved $\Theta^p_2$-completeness for the winner problem in Kemeny elections, and Rothe, Spakowski, and Vogel \cite{rothe} proved the same for the winner problem in Young elections.
+
+\section{Winner Prediction Under Uncertainty} \label{sec:winner-prediction}
+
+We will now discuss one more problem, which is the particular motivation for this work.
+It focuses on some type of uncertainty in elections.
+Such models have been considered in many ways, two significant examples are \emph{possible winner} and \emph{necessary winner} problems introduced by Konczak and Lang \cite{konczak} and further studied by many other researchers; see, e.g., Xia and Conitzer \cite{xia}; Betzler and Dorn \cite{betzler}.
+These problems focus on voting schemes with incomplete knowledge about voters' preferences and answer the question if a candidate is a winner for some extension of preference orders (possible winner), or if he is a winner no matter how we extend preference orders (necessary winner).
+
+Our problem focuses on a different type of uncertainty---we consider elections where the set of participating candidates and the set of voters are uncertain.
+In the full generality of this problem we do not know which candidates will take part in the election and which voters will cast their votes.
+However, for each subset of candidates we know the probability that exactly candidates in this subset participate in the election, and for each subset of voters we know the probability that exactly voters in such subset cast their votes.
+Our goal is to compute the probability that a given candidate wins the election.
+The problem can very easily become computationally hard with unrestricted probability distributions.
+Therefore we provide some conditions that should hold in these distributions, so that the large class of cases become computationally easy.
+The formal description of the winner prediction model along with those restrictions is presented in Section~\ref{sec:prediction}.
+
+It turns out that our winner prediction problem (after applying the restrictions) can be reduced to counting variants of election control problems.
+We focus on several popular voting systems and we ask how hard it is to not only find whether such type of control is possible, but to find out how many such possibilities exist.
+Our results show that counting variants of control problems under plurality, approval and Condorcet systems are polynomial-time solvable whenever the decision variants are.
+(Note that this is far from obvious: It is well-known that deciding if a perfect matching in a bipartite graph exists is polynomial-time computable, but counting such matchings is \sharpPclass-hard, \cite{valiant}.)
+This means that for the respective cases our winner prediction problems are polynomial-time solvable.
+Only in maximin we conjecture there is a difference between counting and decision variants---we believe that the case of deleting candidates is computationally hard when we count solutions while it is computationally easy when we decide if a solution exists.
+
+\section{The Structure of the Thesis} \label{sec:structure}
+
+This thesis has the following structure.
+In Chapter~\ref{ch:preliminaries} we provide brief background of mathematical foundations and a quick recapitulation of the most essential notions of computational complexity theory.
+The latter is used in descriptions of algorithms and proofs we construct, and the former is needed to define some of the more complex structures such as elections and voting systems.
+We describe elections and voting systems in Chapter~\ref{ch:elections} along with precise definitions of our control problems and a formal description of prediction of the winner model.
+Further chapters are the core of this work---they describe results for individual voting system.
+They are: plurality voting in Chapter~\ref{ch:plurality}, approval voting and Condorcet voting both in Chapter~\ref{ch:approval_condorcet}, and maximin voting in Chapter~\ref{ch:maximin}.
+We conclude in Chapter~\ref{ch:summary} with summarizing remarks and suggestions for further research.

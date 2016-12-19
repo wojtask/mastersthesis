@@ -1,0 +1,244 @@
+\chapter{Elections and Election-Related Problems} \label{ch:elections}
+
+In order to study elections from the point of view of computational complexity theory, we need to transform the intuitive sense of what elections and voting systems are into a precise mathematical model.
+The current chapter includes formal definitions of these notions, and specifications of control problems we will study under several voting systems.
+We also make an overview of the most common voting rules along with the demonstration of how they work for some specified collections of candidates and voters.
+We point the reader to \cite{arrow} for general reference.
+
+\section{Elections and Voting Systems} \label{sec:elections}
+
+We begin by formalizing the central notion of this paper---an election.
+
+\begin{definition}
+    An election $E$ is an ordered pair $(C,V)$ where $C$ is a finite non-empty set of candidates and $V$ is a finite non-empty multiset of voters, where each voter is represented by a total order over $C$.
+\end{definition}
+
+In this work we use $m$ to denote the number of candidates in $C$ and $n$ to denote the number of voters in $V$, and assume that $C=\{c_0,c_1,\dots,c_{m-1}\}$.
+Voters vote on the candidates by setting their preference lists, i.e., by putting the candidates in order from the most preferred one to the most despised one.
+Thus, $V=\{\succ_0,\succ_1,\dots,\succ_{n-1}\}$ is a multiset over the set of all total orders over $C$.
+In most cases we study, such definition of election is sufficient, although in many situations we do not have the full information about voters' preferences.
+We may have only partial knowledge and do not know what the rest of the voter's preference is.
+Thus, every element of $V$ can be treated as a partial order over $C$ and in this case we say $E=(C,V)$ is a \emph{partial election}.
+
+\begin{Example} \label{ex:election1}
+	Let us consider an election $E=(C,V)$, where:
+	\begin{align*}
+		C &= \{c_0,c_1,c_2\}, \\
+		V &= \bigl\{c_1\succ_0c_2\succ_0c_0,\;c_2\succ_1c_1\succ_1c_0,\;c_0\succ_2c_2\succ_2c_1,\;c_1\succ_3c_2\succ_3c_0\bigr\}.
+	\end{align*}
+	We have $m=3$ candidates and $n=4$ voters, where the first and the fourth voter provide the same ranking:
+	They prefer candidate $c_1$ over $c_2$, and $c_2$ over $c_0$.
+\end{Example}
+
+Once we have an election, we need some formal rule---or protocol---for determining the winner(s) of the election.
+We call this rule a \emph{voting system}.
+Consider the following definition.
+
+\begin{definition}
+A voting system $\mathcal{E}$ is defined to be a function mapping an election $E=(C,V)$ to a set $W\subseteq C$ of candidates who win the election $E$.
+\end{definition}
+
+We also call $\mathcal{E}$ a voting rule, a voting protocol, or a voting scheme.
+The members of the set $W$ from the definition above are called $\mathcal{E}$-winners---or simply winners---of election $E$ when a voting system is known from a context.
+The set $W$ may be empty if there are no winners of the election, may be a singleton---we will then say that the election has a \emph{unique winner}---or may have more than one element.
+
+There are very many voting systems.
+We, in particular, study some of the so-called \emph{scoring protocols} and some of \emph{Condorcet-consistent rules}.
+
+Scoring protocols are an important class of voting systems.
+Given $m$ candidates, each scoring protocol is defined by a \emph{scoring vector} $\boldsymbol\alpha=(\alpha_1,\alpha_2,\dots,\alpha_m)$ satisfying $\alpha_1\ge\alpha_2\ge\cdots\ge\alpha_m\ge0$.
+When a candidate is placed on the $i$th position in a voter's preference order, he receives $\alpha_i$ points.
+After summing up the scores granted by each voter, the candidate(s) with the highest score are the winners of the election.
+Given a scoring system, we write $\score{E}(c_j)$ to mean the score of candidate $c_j$ in election $E$.
+The most common scoring systems are:
+\begin{Enumerate}
+	\item \emph{plurality voting}, with the scoring vector $\boldsymbol\alpha_{\id{Plurality}}=(1,\overbrace{0,\dots,0}^{m-1})$,
+	\item \emph{veto voting}, with the scoring vector $\boldsymbol\alpha_{\id{Veto}}=(\overbrace{1,\dots,1}^{m-1},0)$, and
+	\item \emph{Borda count}, with the scoring vector $\boldsymbol\alpha_{\id{Borda}}=(m-1,m-2,\dots,0)$.
+\end{Enumerate}
+
+Let us consider once again election $E$ from Example~\ref{ex:election1}, and determine which candidates win under the three voting systems defined above.
+In plurality rule $c_1$ receives 2 points, while other candidates get 1 point each, so clearly $c_1$ is the unique winner of $E$.
+Formally, we write $\id{Plurality}(E)=\{c_1\}$.
+Under veto rule, $c_2$ receives 4 points, $c_1$ receives 3 points, and $c_0$ receives only 1 point, so $\id{Veto}(E)=\{c_2\}$.
+In Borda voting we have that both $c_1$ and $c_2$ get 5 points, while $c_0$ gets only 2 points, thus $\id{Borda}(E)=\{c_1,c_2\}$.
+This example shows that our choice of the voting rule is very important, because under different rules we may get different sets of winners.
+The other thing to notice is that the more voters rank some candidate low, the less chance this candidate has to be a winner.
+This is a direct consequence of the fact that the scoring vector is a non-increasing sequence.
+
+Another type of voting system is \emph{approval voting}.
+Its structure is slightly different from the other systems, as we do not treat voters' preference orders as total or partial orders but as subsets of $C$.
+Each voter $v_i\in V$ provides a subset $A_i\subseteq C$ of candidates that he approves of.
+A candidate $c\in C$ is a winner, when he appears in the largest number of such subsets.
+
+\begin{Example} \label{ex:election2}
+    Let $E=(C,V)$, where:
+	\begin{align*}
+		C &= \{c_0,c_1,c_2\}, \\
+		V &= \bigl\{\underbrace{\{c_0,c_1,c_2\}}_{A_0},\underbrace{\{c_0,c_1,c_2\}}_{A_1},\underbrace{\{c_0\}}_{A_2},\underbrace{\{c_0,c_1,c_2\}}_{A_3}\bigr\}.
+	\end{align*}
+	Voters' preferences are similar to those in Example~\ref{ex:election1}, but they do not provide the order of candidates in each vote.
+	Each voter specifies the set of candidates that he approves of.
+	We can see that every voter but the third approves of all the three candidates, and the remaining one approves only of $c_0$.
+	With this configuration, $c_0$ gets 4 points, and other candidates get 3 points each.
+	Thus $\id{Approval}(E)=\{c_0\}$.
+	This example shows that it is possible to secure victory of a candidate even though it might seem unlikely under other voting schemes, since $c_0$ is not a winner of the similar election from Example~\ref{ex:election1} under every other voting scheme considered in this section.
+\end{Example}
+
+There is also a modified version of this election system, called \emph{$k$-approval voting} (for integer $k$ such that $1\le k\le m$) in which we demand that every voter chooses exactly $k$ candidates, i.e., $|A_i|=k$, for each integer $i$, $1\le i\le n$.
+$k$-approval can also be viewed as a scoring protocol with scoring vector $\boldsymbol\alpha_{k\text{-}\!\id{Approval}}=(\underbrace{1,\dots,1}_k,\underbrace{0,\dots,0}_{m-k})$.
+Note that the case $k=m$ is trivial, as the whole $C$ is the set of winners, if $k=1$, this system is equivalent to plurality voting and if $k=m-1$ then we have veto.
+When $1\le k\le m-1$, $(m-k)$-approval is often called \emph{$k$-veto voting}.
+
+The second class of voting rules that we study here are those that consider results of pairwise comparisons of candidates.
+An important and well studied rule is \emph{Condorcet voting} in which $c\in C$ is a winner if and only if for each $c'\in C-\{c\}$, $c\succ_i c'$ for more than $n/2$ of preference orders $\succ_i$ from $V$.
+There can be at most one winner under Condorcet's rule and he is called the \emph{Condorcet winner}.
+We define $\beaten{E}(c_j,c_k)$ to be the number of preference orders $\succ_i$ from $V$, such that $c_j\succ_i c_k$.
+Thus, $c$ is a Condorcet winner exactly, if $\beaten{E}(c,c')>\beaten{E}(c',c)$ for each $c'\in C-\{c\}$.
+
+In Example~\ref{ex:election1} there is no Condorcet winner as $c_1$ wins with $c_2$ in 2 votes, $c_2$ wins over $c_1$ also in 2 votes, and $c_0$ wins over both $c_1$ and $c_2$ only in 1 vote.
+Therefore, we can write $\id{Condorcet}(E)=\emptyset$.
+
+The last voting system we consider in this work, called \emph{maximin voting}, is based on scoring while making use of some of the ideas from Condorcet rule.
+In maximin system, the score of candidate $c\in C$ is defined as $\min_{c'\in C-\{c\}}\beaten{E}(c,c')$.
+The score of candidate $c_0$ from Example~\ref{ex:election1} is 1, and the score of $c_1$ and $c_2$ is 2, thus $\id{Maximin}(E)=\{c_1,c_2\}$.
+
+% The winner in \emph{Dodgson voting} is the candidate that becomes a Condorcet winner by fewest swaps of adjacent candidates in voters' preferences.
+% In \cite{bartholdi2} Bartholdi, Tovey, and Trick prove that the winner determination and the question of which of the two candidates have greater score to be \NPclass-hard problems.
+% Further studies of Hemaspaandra, Hemaspaandra, and Rothe \cite{hemaspaandra2} show that both of these problems are $\Theta^p_2$-complete.
+% In \cite{bartholdi2} the authors also consider the problem in which one asks if a distinguished candidate has score at most some nonnegative constant, and they prove it is \NPclass-comptete.
+
+% Because of such issues, \emph{simplified Dodgson voting}, where one can say who is a winner in polynomial time, is often considered.
+% Let $\deficit{E}(c_j,c_k)$ be the minimum number of votes in election $E$ in which $c_j$ should be ranked ahead of $c_k$, so that $c_j$ wins the head-to-head contest with $c_k$.
+% The winner of simplified Dodgson voting is a candidate $c\in C$ with the lowest score defined as $\score{E}(c)=\sum_{c'\in C-\{c\}}\deficit{E}(c,c')$.
+% 
+% For election $E$ from Example \ref{ex:election1}, we get the following values:
+% \begin{align*}
+%     \deficit{E}(c_0,c_1)=2, &\; \deficit{E}(c_0,c_2)=2, \qquad \score{E}(c_0)=4, \\
+% 	\deficit{E}(c_1,c_0)=0, &\; \deficit{E}(c_1,c_2)=1, \qquad \score{E}(c_1)=1, \\
+%     \deficit{E}(c_2,c_0)=0, &\; \deficit{E}(c_2,c_1)=1, \qquad \score{E}(c_2)=1.
+% \end{align*}
+% Thus, we have $\id{Simplified-Dodgson}(E)=\{c_1,c_2\}$.
+
+\section{Control Problems in Elections and Their Counting Variants} \label{sec:control}
+
+Control is an attack widely used in real-world elections.
+Although many types of elections are performed secretly, i.e., nobody but the voter knows his own preferences, there are situations where some actor (or a group of actors) has partial or complete knowledge of all the votes.
+In such situations this actor may seek to determine the way how the parameters of the election can be changed in order to achieve the desired outcome.
+Political parties often keep track of the statistics and pre-election polls and develop advertisements directed at particular groups of people in order to convince them to vote.
+Another example of control attack can be observed in song of the month contests.
+A radio station may promote new songs by adding them to the list and increasing their chances for gaining popularity, hence increasing the producer income.
+
+Given an election, we ask if it is possible to modify it in some way in order to make the distinguished candidate a winner (constructive control problem), or to prevent this candidate from being a winner (destructive control problem).
+The types of such modifications will be precisely described later in this section, but in short, we can add or delete some candidates or voters.
+Partitioning candidates or voters into a 2-round structure is also studied in the literature along with two different tie-breaking rules, but in this work we do not discuss these types of control.
+The family of control problems has been formulated and studied by Bartholdi, Tovey, and Trick in \cite{bartholdi} and by Hemaspaandra, Hemaspaandra, and Rothe in \cite{hemaspaandra}.
+These papers show that some of the modifications are computationally easy to perform in order to solve a problem, while the others are computationally hard, or even never lead to a solution.
+
+In this work we focus on the counting variants of control problems rather than on the decision ones.
+Therefore, we are interested not only in determining if a solution to the problem exists, but also in the existence of fast algorithms that count all the solutions to the given problem.
+
+We now formally define all problems we study in this paper.
+Every problem we consider has received a name which is made of the name of the election system $\mathcal{E}$; a short prefix defining the type, such as `AV' for adding voters; one of `${}_\textnormal{C}$' or `${}_\textnormal{D}$' subscripts denoting that the problem is either the constructive case or the destructive case; and a description part which is `\textsc{Control}' in each of them.
+To distinguish them from the decision variants, we put a `\#' sign after election system part.
+If we study the problem given some election system, say approval voting, we write `\!{\it Approval\/}' in the description part instead of $\mathcal{E}$.
+
+\paragraph{Counting Variant of Control by Adding Candidates}
+\begin{description}
+	\item[Name:] \Control{AC}{C}
+	\item[Given:] An election $E=(C,V)$, a set $C'$ of additional candidates with $C\cap C'=\emptyset$, a distinguished candidate $c\in C$, and a positive integer $k\le|C'|$.
+	Each voter in $V$ provides preferences over $C\cup C'$.
+	\item[Question:] How many sets $B\subseteq C'$ with $|B|\le k$ are there, such that $c$ is the unique $\mathcal{E}$-winner of election $E'=(C\cup B,V)$?
+\end{description}
+
+\paragraph{Counting Variant of Control by Deleting Candidates}
+\begin{description}
+	\item[Name:] \Control{DC}{C}
+	\item[Given:] An election $E=(C,V)$, a distinguished candidate $c\in C$, and a positive integer $k\le m$.
+	\item[Question:] How many sets $B\subseteq C$ with $|B|\le k$ are there, such that $c$ is the unique $\mathcal{E}$-winner of election $E'=(C-B,V)$?
+\end{description}
+
+\paragraph{Counting Variant of Control by Adding Voters}
+\begin{description}
+	\item[Name:] \Control{AV}{C}
+	\item[Given:] An election $E=(C,V)$, a multiset $V'$ of additional voters, $V\cap V'=\emptyset$, with preferences over $C$, a distinguished candidate $c\in C$, and a positive integer $k\le|V'|$.
+	\item[Question:] How many multisets $U\subseteq V'$ with $|U|\le k$ are there, such that $c$ is the unique $\mathcal{E}$-winner of election $E'=(C,V\uplus U)$?
+\end{description}
+
+\paragraph{Counting Variant of Control by Deleting Voters}
+\begin{description}
+	\item[Name:] \Control{DV}{C}
+	\item[Given:] An election $E=(C,V)$, a distinguished candidate $c\in C$, and a positive integer $k\le n$.
+	\item[Question:] How many multisets $U\subseteq V$ with $|U|\le k$ are there, such that $c$ is the unique $\mathcal{E}$-winner of election $E'=(C,V-U)$?
+\end{description}
+
+\bigskip
+The instances of each problem above are tuples constructed from the elements listed in the ``Given'' parts.
+For example, in \Control{AV}{C} each instance is of the form $(E,V',c,k)$.
+The set of solutions in every case is of course the set of naturals, as in all counting problems.
+
+The destructive versions of control problems differ only in the ``Question'' part, which demands that $c$ is \emph{not} the unique $\mathcal{E}$-winner of the appropriately defined election $E'$.
+Moreover, in \Control{DC}{D} we prevent deleting $c$ (also assuming that $k<m$), since otherwise any voting system could have been trivially controlled.
+
+When regarding decision variants of control problems we say a voting system is \emph{immune} to control if it is not possible for the chairman to change a distinguished candidate from a non-winner to a unique winner (or inversely in the destructive variant) by ma\-ni\-pu\-la\-ting the set of candidates or the multiset of voters.
+Otherwise, we regard two distinct cases---if for an election system it is hard (i.e., \NPclass-complete) to find a way to control the election, the system is referred to as \emph{resistant}, and if this is always computationally easy (i.e., the problem is in \Pclass), the system is referred to as \emph{vulnerable}.
+Of course, in the case of immunity the counting variant of control problem is trivially in \FPclass, as we always return 0; the other cases require a proof of either being in \FPclass\ or being \sharpPclass-complete.
+As we have seen in the previous chapter, if some problem is \NPclass-complete it does not automatically mean that its counting variant is \sharpPclass-complete (however, it is typically the case).
+
+\section{Winner Prediction Model} \label{sec:prediction}
+
+We will now describe how winner prediction relates to control problems.
+Let us say we are given a voting rule $\mathcal{E}$, a set $C$ of $m$ candidates, and a multiset $V$ of $n$ voters (for each voter we have perfect knowledge as to how he would vote).
+We consider the situation where each candidate from a set $D$, $D\subseteq C$, may or may not participate in the election, and similarly, where each voter from a multiset $W$, $W\subseteq V$, may or may not actually vote.
+For such uncertain election $E=(C,V)$ we ask for the probability that a designated candidate $c\in C$ is the unique winner under voting system $\mathcal{E}$.
+
+Let us study an example scenario, showing the connection between problem \Control{AV}{C} and the appropriate type of winner prediction; the reader can imagine analogous settings for the remaining types of control.
+Let us assume that set $C$ of candidates participating in the election is fixed (for example, because the election rules force all candidates to register well in advance).
+We know that some multiset $V$ of voters will certainly vote (for example, because they have already voted and this information is public).
+The collection of voters who have not decided to vote yet is $W$\!.
+From some source (e.g., from prior experience) we have some probability distribution $P$ on the number of voters from $W$ that will participate in the election (from our perspective, each equal-sized subcollection of voters from $W$ is equally likely; different-sized collections may, of course, have different probabilities of participating in the election).
+
+In other words, for each $i$, $0\le i\le|W|$, let $P(i)$ be the probability that $i$ voters from $W$ join the election (and assume that we have an easy way of computing this value) and let $Q(i)$ be the probability that a designated candidate $c$ wins under the condition that exactly $i$ voters from $W$ participate (assuming that each $i$-element subcollection of $W$ is equally likely).
+Then, the probability that $c$ wins is simply given by:
+\[
+	P(0)Q(0)+P(1)Q(1)+\dots+P(|W|)Q(|W|).
+\]
+To compute $Q(i)$, we have to compute for how many collections $W$ of size exactly $i$, candidate $c$ wins, and divide it by $\binom{|W|}{i}$.
+To compute for how many sets of size exactly $i$ candidate $c$ wins, we solve the corresponding \Control{AV}{C} problem for adding at most $i$ voters from $W$, then for adding at most $i-1$ voters from $W$, and then we subtract the results.
+
+In our setting we are given two probability distributions, $P_C$ and $P_V$, defined on the set of all subsets of $C$ and, respectively, on the set of every subcollection of $V$.
+We consider two possible scenarios:
+\begin{Enumerate}
+	\item The set of candidates is fixed (i.e., $P_C(C)=1$), but for each multiset of voters $V'$, $V'\subseteq V$, we have probability $P_V(V')$ that exactly the voters from $V'$ show up for the vote.
+	\item The multiset of voters is fixed (i.e., $P_V(V)=1$), but for each set of candidates $C'$, $C'\subseteq C$, we have probability $P_C(C')$ that exactly the candidates from $C'$ participate in the election.
+\end{Enumerate}
+
+Naturally, out task would very quickly become computationally prohibitive if we did not assume anything about $P_C$ and $P_V$.
+Of course, first of all we need to assume that both probabilities, $P_C$ and $P_V$, are polynomial-time computable.
+We also would like to assume that functions $P_C$ and $P_V$ depend only on the cardinality of their arguments.
+More formally, if $C_1$, $C_2\subseteq C$ and $|C_1|=|C_2|$, then $P_C(C_1)=P_C(C_2)$, and analogously for $P_V$.
+In other words, we consider probability distribution regarding the number of candidates (the number of voters) participating in the election, but each same-cardinality subset is equally likely.
+
+However, we will focus on some special situations that will allow us to easily transform our setting to counting variants of control problems.
+In order to do this, we need to slightly weaken the assumption regarding the dependency only on the sizes of candidate/voter sets.
+Often, we may have additional knowledge regarding the nature of possible changes in the candidate/voter set.
+For example, the rules may be such that after a given point of time candidates can withdraw from the election but no new candidates can register.
+Similarly, we may know that some votes have already been cast and cannot be withdrawn.
+Thus, we refine our model to be the following:
+We start with some candidates and voters already in the election, and we ask for the probability that a given candidate wins assuming that some random number of voters/candidates is added/deleted.
+
+More formally, we start with an election $E=(C,V)$ and we consider the following situations:
+\begin{Enumerate}
+    \item The set of candidates $C$ is fixed, and each voter from $V$ will vote, but there is a multiset of unregistered voters $V'$, $V'\cap V=\emptyset$, that also may show up for the vote.
+	\item The set of candidates $C$ is fixed, but some of the voters from $V$ may not show up for the vote.
+	\item The multiset of voters $V$ is fixed, and each candidate from $C$ will participate in the election, but there is a set of unregistered candidates $C'$, $C'\cap C=\emptyset$, that also may participate.
+	\item The multiset of voters $V$ is fixed, but some of the candidates from $C$ may not participate in the election.
+\end{Enumerate}
+In effect, after applying one of these scenarios to $E$ we obtain an election $E'$.
+For example, in the second case above we consider $E'=(C,V-U)$, where $U\subseteq V$.
+We also use a fixed upper bound for the number of candidates/voters that can be added/deleted in election $E$.
+
+One can easily verify that the prediction of the winner in the presented setting reduces to the counting variants of control problems which have been defined in the previous section.
+
+In the following chapters we study counting variant of control problems under several voting systems.
+If for a voting system $\mathcal{E}$ a particular control problem is computationally easy, so is the corresponding type of winner prediction problem under $\mathcal{E}$.

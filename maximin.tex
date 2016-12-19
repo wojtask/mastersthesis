@@ -1,0 +1,278 @@
+\chapter{Control Problems in Maximin Voting} \label{ch:maximin}
+
+Maximin is the last voting system we study in this thesis.
+The proofs in this chapter are motivated by the analysis of maximin in the work of Faliszewski, Hemaspaandra, and Hemaspaandra \cite{faliszewski3}.
+
+Several proofs in this chapter use an extended notation for total orders.
+Let $X=\{x_1,x_2,\dots,x_k\}$ be a set and $\mathcal{T}(X)$ be a set of all total orders over $X$.
+For a fixed total order $T_X\in\mathcal{T}(X)$ such that $x_1\succ x_2\succ\cdots\succ x_k$ we write $y\succ T_X\succ z$ to denote $y\succ x_1\succ x_2\succ\cdots\succ x_k\succ z$.
+Also, we define $\overleftarrow{T_X}$ to be a total order $T_X$ but in reverse, i.e., $x_k\succ x_{k-1}\succ\cdots\succ x_1$.
+
+\section{Adding and Deleting Candidates} \label{sec:mmcan}
+
+In the following theorem we show \sharpPclass-completeness of the counting variant of constructive adding candidates and we use the result in the next theorem concerning the destructive case.
+
+\begin{theorem} \label{th:mmacc}
+	\MmControl{AC}{C} is \sharpPclass-parsimonious-complete.
+\end{theorem}
+
+\begin{proof}
+It is clear that this problem belongs to \sharpPclass.
+We give a parsimonious reduction from \sharpXthreeC.
+Let $(B,\mathcal{S})$, where $B=\{b_1,\dots,b_{3k}\}$ and $\mathcal{S}=\{S_1,\dots,S_r\}$, be an instance of the \sharpXthreeC\ problem.
+
+We construct a \MmControl{AC}{C} instance as follows.
+Let $E=(C,V)$ be an election, where $C=B\cup\{c\}$ is the set of registered candidates, and $V=\{v_1,\dots,v_{2r+2}\}$ is a multiset of voters.
+We also have a set $A=\{a_1,\dots,a_r\}$ of spoiler (unregistered) candidates.
+Each candidate $a_i$ in $A$ corresponds to a set $S_i$ in $\mathcal{S}$.
+For each $S_i\in\mathcal{S}$ we fix total orders $T_{S_i}\in\mathcal{T}(S_i)$, $T_{B-S_i}\in\mathcal{T}(B-S_i)$, and $T_{A-\{a_i\}}\in\mathcal{T}(A-\{a_i\})$.
+For each $S_i\in\mathcal{S}$, voter $v_i$ reports preference order $c\succ T_{B-S_i}\succ a_i\succ T_{S_i}\succ T_{A-\{a_i\}}$ and voter $v_{r+i}$ reports preference order $\overleftarrow{T_{A-\{a_i\}}}\succ a_i\succ\overleftarrow{T_{S_i}}\succ\overleftarrow{T_{B-S_i}}\succ c$.
+Voter $v_{2r+1}$ reports $c\succ T_A\succ T_B$ and voter $v_{2r+2}$ reports $\overleftarrow{T_B}\succ c\succ\overleftarrow{T_A}$, where $T_A\in\mathcal{T}(A)$, and $T_B\in\mathcal{T}(B)$ are some fixed total orders.
+
+We claim that every set $A'$, $A'\subseteq A$, such that $|A'|\le k$ and that $c$ is a unique winner of maximin election $E'=(C\cup A',V)$ corresponds one-to-one to a family $\mathcal{S'}$, $\mathcal{S'}\subseteq\mathcal{S}$, such that $|\mathcal{S'}|=k$ and $\mathcal{S'}$ is an exact set cover of $B$.
+
+To show the claim, let us observe that for each pair of distinct elements $b_i$, $b_j\in B$, we have $\beaten{E}(b_i,b_j)=\beaten{E}(c,b_i)=\beaten{E}(b_i,c)=r+1$.
+That is, the winners in election $E$ are all candidates as all of them tie.
+Candidate $c$ is a winner of $E$, but we need to make him the unique winner.
+Now consider a set $A'\subseteq A$, $|A'|\le k$, and an election $E'=(C\cup A',V)$.
+Note that values of $\beaten{E}$ and $\beaten{E'}$ are the same for each pair of candidates in $B\cup\{c\}$.
+For each pair of distinct elements $a_i$, $a_j\in A'$, we have $\beaten{E'}(c,a_i)=r+2$, $\beaten{E'}(a_i,c)=r$, and $\beaten{E'}(a_i,a_j)=r+1$.
+For each $b_i\in B$ and each $a_j\in A'$ we have that
+\[
+	\beaten{E'}(b_i,a_j) =
+	\begin{cases}
+		r, & \text{if $b_i\in S_j$}, \\
+		r+1, & \text{if $b_i\notin S_j$},
+	\end{cases}
+\]
+and $\beaten{E'}(a_j,b_i)=|V|-\beaten{E'}(b_i,a_j)=2r+2-\beaten{E'}(b_i,a_j)$.
+Thus, by definition of maximin, we have the following scores in $E'$:
+\begin{Enumerate}
+	\item $\score{E'}(c)=r+1$,
+	\item for each $a_j\in A'$, $\score{E'}(a_j)=r$, and
+	\item for each $b_i\in B$,
+	\[
+		\score{E'}(b_i) =
+		\begin{cases}
+			r, & \text{if there is $a_j\in A'$ such that $b_i\in S_j$}, \\
+			r+1, & \text{otherwise}.
+		\end{cases}
+	\]
+\end{Enumerate}
+
+Since $|A'|\le k$, it is easy to see that $c$ is the unique winner of $E'$ if and only if for each $b_i\in B$, $\score{E'}(b_i)=r$, which holds if and only if family $\mathcal{S'}$ corresponding to $A'$ is an exact set cover of $B$.
+\end{proof}
+
+\begin{theorem} \label{th:mmacd}
+	\MmControl{AC}{D} is \sharpPclass-metric-complete.
+\end{theorem}
+
+\begin{proof}
+We proof if this theorem is analogous to the proof of Theorem~\ref{th:placd}.
+The answer to this problem is $\sum_{i=0}^k\binom{|C'|}{i}$ subtracted by the answer to problem \MmControl{AC}{C} for the same instance.
+Since the constructive version is \sharpPclass-parsimonious-complete, the current problem is \sharpPclass-metric-complete.
+\end{proof}
+
+Control by deleting candidates in maximin has an interesting property.
+While the decision variant of this problem is polynomial-time computable, it is very likely that its counting variant is computationally hard.
+We were not able to prove this fact, but we simplify \MmControl{DC}{C} by modelling it as a graph problem with a simpler structure.
+
+First we prove that the decision variant of control by deleting candidates in maximin election is in \Pclass.
+
+\begin{theorem} \label{th:mmdcc}
+	${\it Maximin\/}\textnormal{-DC${}_\textnormal{C}$-}\textsc{Control}$ is in \Pclass.
+\end{theorem}
+
+\begin{proof}
+Given an election $E=(C,V)$, a distinguished candidate $c\in C$, and a positive integer $k\le m$, we ask if there is a set $B\subseteq C$ with $|B|\le k$, such that $c$ is the unique winner of election $E'=(C-B,V)$.
+Let us study how do scores of candidates change after removing candidates.
+Since score of candidate $p\in C$ in maximin election is defined as $\min_{p'\in C-\{p\}}\beaten{E}(p,p')$, we cannot decrease $p$'s score.
+So, there are two ways to make $c$ the unique winner:
+\begin{Enumerate}
+	\item by deleting such candidates $c'$ that have greater score than $c$ has, or
+	\item by deleting such candidates $c''$ for which $\beaten{E}(c,c'')=\score{E}(c)$, i.e., the value $\beaten{E}(c,c'')$ is minimal for $c$.
+\end{Enumerate}
+Of course, when trying to increase $c$'s score by applying these rules, we may increase other candidates' scores as well, and make these candidates winners instead of $c$.
+The idea is to performing these operations while preserving $c$'s score, and then to check if the number of deleted candidates does not exceed $k$.
+
+Based on this observation we create a polynomial-time algorithm that solves problem ${\it Maximin\/}\textnormal{-DC${}_\textnormal{C}$-}\textsc{Control}$.
+
+\begin{codebox}
+\Procname{$\proc{Mm-DCC}(E,c,k)$}
+\li	\For $i:=0$ \To $n$
+\li		\Do Let $M_{c,i}$ be the set of candidates $c'\in C-\{c\}$, s.t.\ $\beaten{E}(c,c')=i$.
+		\End
+\li	\For $j:=\score{E}(c)$ \To $\max_{c'\in C-\{c\}}\beaten{E}(c,c')$ \label{mmdcc:main_loop_beg}
+\li		\Do
+			$B:=\bigcup_{i=0}^{j-1}M_{c,i}$
+\li			\While $(C-\{c\})-B$ contains $p$, s.t. $\score{(C-B,V)}(p)\ge\score{(C-B,V)}(c)$ \label{mmdcc:greedy_beg}
+\li				\Do $B:=B\cup\{p\}$
+				\End \label{mmdcc:greedy_end}
+\li			\If $M_{c,j}\nsubseteq B$ and $|B|\le k$
+\li				\Then \Return ``yes''
+				\End
+		\End \label{mmdcc:main_loop_end}
+\li	\Return ``no''
+\end{codebox}
+
+The first step in the algorithm is computing, for each integer $i$, $0\le i\le n$, the set $M_{c,i}=\{\,c'\in C-\{c\}:\beaten{E}(c,c')=i\,\}$.
+Note that if $j\le\max_{c'\in C-\{c\}}\beaten{E}(c,c')$ and $B=\bigcup_{i=0}^{j-1}M_{c,i}$, then $c$ have score equal to $j$ in election $(C-B,V)$.
+
+The main loop of the algorithm (lines \ref{mmdcc:main_loop_beg}--\ref{mmdcc:main_loop_end}) consists of at most $n+1$ steps.
+For each integer $j$, $\score{E}(c)\le j\le\max_{c'\in C-\{c\}}\beaten{E}(c,c')$, we check if it is possible to delete at most $k$ candidates and make $c$ the unique winner having score equal to $j$ in the modified election.
+To do this, we set $B$ to be $\bigcup_{i=0}^{j-1}M_{c,i}$, and then we try to add to $B$ such candidates which prevent $c$ from being the unique winner in election $(C-B,V)$.
+Clearly, every candidate $p\in(C-\{c\})-B$ of score higher than or equal to $c$'s score in election $(C-B,V)$ should have been added to $B$.
+We repeat this operation for a current set $B$, because the candidates just added to $B$ may have increased scores of other candidates in $(C-B,V)$.
+This greedy procedure, implemented in lines \ref{mmdcc:greedy_beg}--\ref{mmdcc:greedy_end}, eventually ends.
+However, now we could have $M_{c,j}\subseteq B$, which would mean that we have increased $c$'s score, but we assumed it should be constant during this iteration of the main loop.
+Otherwise, if the cardinality of the set $B$ is at most $k$, the algorithm returns ``yes'', as $c$ is the unique winner of election $E'=(C-B,V)$.
+After checking every value of $j$ without success the algorithm returns ``no'', because it is impossible to make $c$ the unique winner.
+
+Clearly, our algorithm can be performed in polynomial time, thus we have that ${\it Maximin\/}\textnormal{-DC${}_\textnormal{C}$-}\textsc{Control}\in\Pclass$.
+\end{proof}
+
+Let us now move on to the counting variant.
+Note that when the algorithm described in the proof above is going to return ``yes'', it has already found one possible way to delete candidates.
+At this moment we may delete additional candidates from $(C-\{c\})-B$ as long as $c$ is still the unique winner with score equal to $j$ and the total number of deleted candidates does not exceed $k$.
+Our goal is to count such possibilities.
+
+When we delete a candidate from $(C-\{c\})-B$, other candidate's score may increase and become greater than or equal to $j$, in which case it should also be deleted to make sure $c$ is still a unique winner.
+Sometimes, when such a situation occurs, we need to delete not only one candidate but a group of them.
+More formally, candidate $p$ increases its score to be $j$ or greater after we delete each candidate $p'$ from $\bigcup_{i=0}^{j-1}M_{p,i}$.
+This situation can be modeled as a directed graph $G$, in which $C-B$ is the set of vertices, and for each pair of vertices $u$ and $v$, there is an arc from $u$ to $v$ if and only if $v\in\bigcup_{i=0}^{j-1}M_{u,i}$.
+Note that in order to make $v$'s score greater than or equal to $j$ (and therefore to make $v$ a new winner), we need to delete every candidate represented by vertex $u$, such that $(u,v)$ is an arc in graph $G$.
+
+By \emph{terminal vertex} we will call a vertex $u$ such that there are no arcs leaving $u$.
+Note that in our graph $G$, the only terminal vertex is $c$.
+Our problem is to count such subsets of candidates from $(C-\{c\})-B$ whose cardinality does not exceed $k-|B|$ and whose deletion does not change $c$'s score (which is $j$).
+For graph $G$, it means that we count sets of vertices $R$, $R\subseteq (C-\{c\})-B$, such that:
+\begin{Enumerate}
+	\item $|R|\le k-|B|$,
+	\item $M_{c,j}\nsubseteq R$, and
+	\item $c$ is the only terminal vertex of $G'$---the induced subgraph of $G$ in which the set of vertices is $(C-B)-R$.
+\end{Enumerate}
+The first condition above is trivial.
+Without the second condition we could change the score of $c$, while our goal is to keep this score constant.
+The last condition is also important---if there would be any other terminal vertex in $G'$, we should have removed it from our graph, as the candidate represented by it has score greater than or equal than $c$'s score.
+
+Note, that we can omit the second condition when counting sets of vertices satisfying these conditions.
+We create induced subgraph $G''$ of $G$ in which we removed vertices from $M_{c,j}$ and the smallest set of additional vertices which should be further removed in order to make $c$ the graph's only terminal vertex.
+The set of additional vertices to remove can be computed by a greedy method from the proof of Theorem~\ref{th:mmdcc}.
+The answer to our counting problem is the number of sets of vertices of $G$ satisfying the first and the third condition, decreased by the number of sets of vertices of $G''$ satisfying the first and the third condition.
+
+The following conjectures state that control by deleting candidates in maximin (and, equivalently, the graph problem from the previous paragraphs) is computationally hard, in both constructive and destructive cases.
+
+\begin{conjecture} \label{cj:mmdcc}
+	\MmControl{DC}{C} is \sharpPclass-parsimonious-complete.
+\end{conjecture}
+
+\begin{conjecture} \label{cj:mmdcd}
+	\MmControl{DC}{D} is \sharpPclass-metric-complete.
+\end{conjecture}
+
+If Conjecture~\ref{cj:mmdcc} is true, the proof of Conjecture~\ref{cj:mmdcd} will be simple adaptation of the proof of Theorem~\ref{th:pldcd}.
+
+\section{Adding and Deleting Voters} \label{sec:mmvot}
+
+\begin{theorem} \label{th:mmavc}
+	\MmControl{AV}{C} is \sharpPclass-parsimonious-complete.
+\end{theorem}
+
+\begin{proof}
+Clearly, the problem is in \sharpPclass.
+We show a parsimonious reduction from \sharpXthreeC\ in order to prove it is \sharpPclass-parsimonious-hardness.
+
+Given an instance $(B,\mathcal{S})$ of \sharpXthreeC, where $B=\{b_1,\dots,b_{3k}\}$ and $\mathcal{S}=\{S_1,\dots,S_r\}$, we construct an election $E=(C,V)$, where $C=B\cup\{c,w\}$ is the set of candidates, and $V=\{v_1,\dots,v_{4k}\}$ is a multiset of registered voters.
+For a fixed total order $T_B\in\mathcal{T}(B)$ there are:
+\begin{Enumerate}
+	\item $2k$ voters with preference order $w\succ T_B\succ c$,
+	\item $k$ voters with preference order $c\succ T_B\succ w$, and
+	\item $k$ voters with preference order $c\succ w\succ T_B$.
+\end{Enumerate}
+We also have a multiset $V'$ of $r$ unregistered voters, where $i$th voter, $1\le i\le r$, reports preference order $T_{B-S_i}\succ c\succ T_{S_i}\succ w$, with fixed total orders $T_{S_i}\in\mathcal{T}(S_i)$ and $T_{B-S_i}\in\mathcal{T}(B-S_i)$.
+
+We claim that every multiset $U$, $U\subseteq V'$, such that $|U|\le k$ and that $c$ is a unique winner of maximin election $E'=(C,V\uplus U)$ corresponds one-to-one to a family $\mathcal{S'}$, $\mathcal{S'}\subseteq\mathcal{S}$, such that $|\mathcal{S'}|=k$ and $\mathcal{S'}$ is an exact set cover of $B$.
+
+It is easy to verify that for each $b_i\in B$ it holds that $\beaten{E}(c,b_i)=\beaten{E}(c,w)=2k$.
+Similarly, for each $b_i\in B$ it holds that $\beaten{E}(w,b_i)=3k$ and that $\beaten{E}(w,c)=2k$.
+Thus, $\score{E}(c)=\score{E}(w)=2k$.
+It is also easy to verify that for each $b_i\in B$ it holds that $\score{E}(b_i)\le k$.
+
+Let $U$, $U\subseteq V'$, be a multiset containing at most $k$ voters, and let $E'=(C,V\uplus U)$.
+For each $b_i\in B$ it holds that $\score{E'}(b_i)\le2k$.
+Since each voter in $V'$ ranks $w$ as the least desirable candidate, $\score{E'}(w)=2k$.
+Let us now find a score of $c$.
+If there exists a candidate $b_i\in B$ such that there is no voter in $V'$ that prefers $c$ to $b_i$, then $\beaten{E'}(c,b_i)=2k$ and thus $\score{E'}(c)=2k$.
+Otherwise, $\score{E'}(c)\ge2k+1$.
+Thus, $c$ is a unique winner of $E'$ if and only if $U$ corresponds to an exact set cover of $B$.
+\end{proof}
+
+\begin{theorem} \label{th:mmdvc}
+	\MmControl{DV}{C} is \sharpPclass-parsimonious-complete.
+\end{theorem}
+
+\begin{proof}
+It is clear this problem is in \sharpPclass.
+We show that it is \sharpPclass-parsimonious-hard by parsimonious transformation from \sharpXthreeC.
+
+Let $(B,\mathcal{S})$ be an instance of the \sharpXthreeC\ problem, where $B=\{b_1,\dots,b_{3k}\}$ with $k\ge3$, and $\mathcal{S}=\{S_1,\dots,S_r\}$.
+We form an election $E=(C,V)$ where $C=B\cup\{c,w\}$ and $V=V'\cup V''$ with $V'=\{v_1',\dots,v_{2r}'\}$, $V''=\{v_1'',\dots,v_{2r-k+2}''\}$.
+For each $i$, $1\le i\le r$, and for fixed total orders $T_{S_i}\in\mathcal{T}(S_i)$, $T_{B-S_i}\in\mathcal{T}(B-S_i)$, voter $v_i'$ reports preference order $w\succ T_{B-S_i}\succ c\succ T_{S_i}$ and voter $v_{r+i}'$ reports preference order $w\succ\overleftarrow{T_{S_i}}\succ c\succ\overleftarrow{T_{B-S_i}}$.
+Let $T_B\in\mathcal{T}(B)$ be a fixed total order.
+Among the voters in $V''$ there are:
+\begin{Enumerate}
+	\item 2 voters with preference order $c\succ w\succ T_B$,
+	\item $r-k$ voters with preference order $c\succ T_B\succ w$, and
+	\item $r$ voters with preference order $T_B\succ c\succ w$.
+\end{Enumerate}
+
+We claim that every multiset $U$, $U\subseteq V$, such that $|U|\le k$ and that $c$ is a unique winner of maximin election $E'=(C,V-U)$ corresponds one-to-one to a family $\mathcal{S'}$, $\mathcal{S'}\subseteq\mathcal{S}$, such that $|\mathcal{S'}|=k$ and $\mathcal{S'}$ is an exact set cover of $B$.
+
+It is easy to see that candidates in election $E$ have the following scores:
+\begin{Enumerate}
+	\item $\score{E}(w)=2r$ (because $\beaten{E}(w,c)=2r$ and for each $b_i\in B$, $\beaten{E}(w,b_i)=2r+2$),
+	\item $\score{E}(c)=2r-k+2$ (because for each $b_i\in B$, $\beaten{E}(c,w)=\beaten{E}(c,b_i)=2r-k+2$), and
+	\item for each $b_i\in B$, $\score{E}(b_i)\le2r-k$ (because $\beaten{E}(b_i,w)=2r-k$).
+\end{Enumerate}
+Before we delete any voter, $w$ is the unique winner with $k-2$ more points than $c$.
+We can decrease $w$'s score by at most $k$ points via deleting at most $k$ voters.
+
+Let $U$, $U\subseteq V$, be a multiset of voters such that $c$ is the unique winner of $E'=(C,V-U)$.
+We partition $U$ into $U'\cup U''$, where $U'=U\cap V'$ and $U''=U\cap V''$.
+We claim that $U''$ is empty.
+Let us assume that $U''\ne\emptyset$ and let $E''=(C,V-U'')$.
+Since every voter in $V''$ prefers $c$ to $w$, we have that $\beaten{E''}(c,w)=\beaten{E}(c,w)-|U''|$ and thus $\score{E''}(c)\le\score{E}(c)-|U''|$.
+Similarly, assuming $U''\ne\emptyset$, it is easy to see that $\score{E''}(w)\ge\score{E}(w)-|U''|+1$.
+It holds after the observation that deleting any single member of $U''$ cannot decrease $w$'s score.
+That is, we have that $\score{E''}(c)\le2r-k+2-|U''|$ and $\score{E''}(w)\ge2r+1-|U''|$.
+So in $E''$, $w$ has at least $k-1$ more points than $c$.
+Since $|U''|\ge1$, we can delete at most $k-1$ voters $U'$ from election $E''$.
+But then $c$ will not be a unique winner of $E'$, which is a contradiction.
+
+Thus, $U$ contains members of $V'$ only.
+Since $w$ is ranked first in every vote in $V'$, deleting voters from $U$ decreases $w$'s score by exactly $|U|$.
+Further, deleting voters $U$ certainly decreases $c$'s score by at least one point.
+Thus, after deleting voters $U$ we have:
+\begin{Enumerate}
+	\item $\score{E'}(w)=2r-|U|$, and
+	\item $\score{E'}(c)\le2r-k+2-1=2r-k+1$.
+\end{Enumerate}
+In consequence, the only possibility that $c$ is a unique winner after deleting voters $U$ is that $|U|=k$ and we have equality in item~2 above.
+It is easy to verify that this equality holds if and only if $U$ contains $k$ voters among $v_1',\dots,v_r'$ that correspond to an exact set cover of $B$ via sets from $\mathcal{S}$ (under the assumption that $k\ge3$).
+\end{proof}
+
+\begin{theorem} \label{th:mmadvd}
+	\MmControl{AV}{D} and \MmControl{DV}{D} are \sharpPclass-me\-tric-complete.
+\end{theorem}
+
+\begin{proof}
+We get the result by applying the ideas from theorems~\ref{th:acavd} and~\ref{th:acdvd} to maximin system.
+\end{proof}
+
+\section{Summary} \label{sec:mmsum}
+
+As we could see in this chapter, control in maximin system is computationally hard in every considered case (in case of deleting candidates we only conjecture that this result holds).
+Thus, each studied variant of the winner prediction problem is computationally hard in maximin.
+This fact is interesting also because of the fact that we proved there exists a polynomial-time algorithm that solve the decision variant of control by deleting candidates.
+However, it is very likely there are no polynomial-time algorithm that solves the counting variant of such control type.
+We leave the proof of this fact for future research.

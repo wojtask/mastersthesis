@@ -1,0 +1,78 @@
+\ProvidesPackage{mastersthesis}
+
+\RequirePackage{fancyhdr}
+\RequirePackage{clrscode}
+\RequirePackage{amsthm}
+
+\ifpdf
+	\DeclareGraphicsRule{*}{mps}{*}{}
+\fi
+
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+\def\thefigure{\arabic{figure}}
+\def\thetable{\arabic{table}}
+
+% page headers
+\pagestyle{fancyplain}
+\renewcommand{\sectionmark}[1]{\markright{{\bfseries\thechapter.\arabic{section}.}\quad#1}{}}
+\lhead[\fancyplain{}{\small\sffamily\bfseries\thepage}]{\fancyplain{}{\small\sffamily\bfseries\rightmark}}
+\rhead[\fancyplain{}{\small\sffamily\bfseries\leftmark}]{\fancyplain{}{\small\sffamily\bfseries\thepage}}
+\cfoot[]{}
+\addtolength{\headheight}{1.6pt}
+
+% style for theorems
+\newtheoremstyle{mtthm}%
+	{\topsep}%
+	{\topsep}%
+	{\itshape}%
+	{}%
+	{\sffamily\bfseries}%
+	{.}%
+	{.5em}%
+	{\thmname{#1}\thmnumber{ #2}\thmnote{ {\mdseries\rmfamily(#3)}}}
+\theoremstyle{mtthm}
+
+% style for examples
+\newtheoremstyle{mtxmp}%
+	{\topsep}%
+	{\topsep}%
+	{}%
+	{}%
+	{\sffamily\bfseries}%
+	{.}%
+	{.5em}%
+	{}
+\theoremstyle{mtxmp}
+
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{example}{Example}[chapter]
+
+\newenvironment{Example}%
+	{\begin{example}}%
+	{\hbox{}\hfill$\qed$\end{example}}
+
+% environment for enumerated lists, more stretched that the default one
+\newenvironment{Enumerate}%
+	{\vskip5pt\begin{enumerate}\setlength{\itemsep}{5pt}}%
+	{\end{enumerate}\vskip5pt}
+
+\newcommand{\Pclass}{\textnormal{P}}
+\newcommand{\NPclass}{\textnormal{NP}}
+\newcommand{\FPclass}{\textnormal{FP}}
+\newcommand{\sharpPclass}{\textnormal{\#P}}
+
+\newcommand{\score}[1]{\id{score}_{#1}}
+\newcommand{\beaten}[1]{N_{#1}}
+\newcommand{\deficit}[1]{\id{deficit}_{#1}}
+
+\newcommand{\sharpXthreeC}{\textnormal{\#X3C}}
+\newcommand{\Control}[2]{$\cal E$\textnormal{-\##1${}_\textnormal{#2}$-}\textsc{Control}}
+\newcommand{\PlControl}[2]{{\it Plurality\/}\textnormal{-\##1${}_\textnormal{#2}$-}\textsc{Control}}
+\newcommand{\ApControl}[2]{{\it Approval\/}\textnormal{-\##1${}_\textnormal{#2}$-}\textsc{Control}}
+\newcommand{\CdControl}[2]{{\it Condorcet\/}\textnormal{-\##1${}_\textnormal{#2}$-}\textsc{Control}}
+\newcommand{\MmControl}[2]{{\it Maximin\/}\textnormal{-\##1${}_\textnormal{#2}$-}\textsc{Control}}

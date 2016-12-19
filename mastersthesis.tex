@@ -1,0 +1,64 @@
+\documentclass[man,bazy,a4paper,11pt,sfheadings,noindentfirst]{mgrwms}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{geometry}
+\usepackage{clrscode}
+\usepackage{lmodern}
+\usepackage{tocloft}
+\usepackage{hyperref}
+\hypersetup{%
+	pdfauthor={Krzysztof Wojtas},%
+	pdftitle={The Complexity of Control Problems in Elections},%
+	pdfborder={0 0 0},%
+	pdfkeywords={},%
+	pdfstartview=FitH,%
+	hypertexnames=false%
+}
+\usepackage{mastersthesis}
+
+\begin{document}
+
+\title{The Complexity of Control Problems in Elections}
+\author{Krzysztof Wojtas}
+\promotor{dr inż.\ Piotr Faliszewski}
+\nralbumu{203788}
+\keywords{election, voting, election system, social choice, plurality, approval, Condorcet, maximin, winner prediction, election control, computational complexity, \FPclass, \sharpPclass-complete}
+
+\maketitle
+
+\renewcommand{\cfttoctitlefont}{\LARGE\sffamily\bfseries}
+\renewcommand{\cftchapfont}{\sffamily\bfseries}
+\renewcommand{\cftchappagefont}{\sffamily\bfseries}
+\renewcommand{\cftsecfont}{\sffamily}
+\renewcommand{\cftsecleader}{\sffamily\cftdotfill{\cftsecdotsep}}
+\renewcommand{\cftsecpagefont}{\sffamily}
+\setlength{\cftbeforechapskip}{3.75mm}
+
+\tableofcontents
+
+\begin{abstract}
+	We study computational complexity of predicting winners in elections.
+	We show the problem reduces to counting variants of control problems in elections.
+	We consider several voting rules, such as: plurality, approval, Condorcet, and maximin.
+	Regarding each of these methods we analyze altering the set of candidates by adding or deleting candidates, and altering the collection of voters in the same manner.
+	We prove that each of these problems is either in \FPclass\ or is \sharpPclass-complete, and in the former case we provide a polynomial-time algorithm which solves it.
+\end{abstract}
+
+\vskip1in
+
+\include{introduction}
+\include{preliminaries}
+\include{elections}
+\include{plurality}
+\include{approval_condorcet}
+\include{maximin}
+\include{summary}
+
+\bibliographystyle{alpha}
+\bibliography{mastersthesis}
+\nocite{*}
+
+\end{document}
